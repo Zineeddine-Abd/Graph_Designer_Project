@@ -5,10 +5,22 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
+
 public class GraphPanel extends JPanel {
-	
-	//------------------------------------------------------------
-	//because there is only two modes "add node" and "add edges"
+
     private enum Mode { ADD_NODE, ADD_EDGE }
 
     private List<Point> nodes = new ArrayList<>();
@@ -24,45 +36,14 @@ public class GraphPanel extends JPanel {
     
     private JLabel weightLabel;
     private JTextField weightTextField;
-
     private boolean weightEntered = false;
-    
-    //------------------------------------------------------------
 
     public GraphPanel(boolean directed, boolean weighted) {
-    	
         this.directed = directed;
         this.weighted = weighted;
 
         setLayout(null);
-        
-        //to display the user choices in the GraphPanel
-        /*
-        // Add radio buttons for selecting graph type
-        JRadioButton directedButton = new JRadioButton("Directed");
-        directedButton.setBounds(10, 10, 100, 30);
-        directedButton.setSelected(directed);
-        directedButton.setEnabled(false);
-        add(directedButton);
 
-        JRadioButton undirectedButton = new JRadioButton("Undirected");
-        undirectedButton.setBounds(120, 10, 100, 30);
-        undirectedButton.setSelected(!directed);
-        undirectedButton.setEnabled(false);
-        add(undirectedButton);
-
-        // Add checkboxes for selecting if the graph is weighted
-        JCheckBox weightedCheckBox = new JCheckBox("Weighted");
-        weightedCheckBox.setBounds(10, 50, 100, 30);
-        weightedCheckBox.setSelected(weighted);
-        weightedCheckBox.setEnabled(false);
-        add(weightedCheckBox);
-        
-        ButtonGroup group = new ButtonGroup();
-        group.add(directedButton);
-        group.add(undirectedButton);
-		*/
-        
         JButton addNodeButton = new JButton("Add Node");
         addNodeButton.setBounds(10, 20, 100, 30);
         addNodeButton.addActionListener(e -> {
@@ -126,22 +107,20 @@ public class GraphPanel extends JPanel {
     }
 
     private void addNode(Point point) {
-        // Add a node at the clicked point
         nodes.add(point);
         repaint();
     }
 
     private void selectNodesForEdge(Point point) {
-        // Check if the clicked point is on any existing node
         for (Point node : nodes) {
-            if (node.distance(point) < 10) { // Assuming node radius as 10
+            if (node.distance(point) < 10) {
                 if (selectedNode1 == null) {
                     selectedNode1 = node;
                 } else if (selectedNode2 == null && !selectedNode1.equals(node)) {
                     selectedNode2 = node;
                     if (weighted) {
                         String weightStr = weightTextField.getText();
-                        int weight = 1; // Default weight
+                        int weight = 1;
                         try {
                             weight = Integer.parseInt(weightStr);
                         } catch (NumberFormatException ex) {
@@ -151,7 +130,7 @@ public class GraphPanel extends JPanel {
                         weightTextField.setText("");
                         weightLabel.setVisible(false);
                         weightTextField.setVisible(false);
-                        weightEntered = false; // Reset weightEntered flag
+                        weightEntered = false;
                     } else {
                         edges.add(new Edge(selectedNode1, selectedNode2));
                     }
@@ -165,10 +144,9 @@ public class GraphPanel extends JPanel {
     }
 
     private void addEdge() {
-        // This method is called when the user presses enter in the weight text field
         if (selectedNode1 != null && selectedNode2 != null && !weightEntered) {
             String weightStr = weightTextField.getText();
-            int weight = 1; // Default weight
+            int weight = 1;
             try {
                 weight = Integer.parseInt(weightStr);
             } catch (NumberFormatException ex) {
@@ -184,15 +162,38 @@ public class GraphPanel extends JPanel {
         }
     }
 
+    // Method to create graph from adjacency matrix
+    public void createGraphFromAdjacencyMatrix(int[][] adjacencyMatrix) {
+    	
+        nodes.clear();
+        edges.clear();
+        
+        int numNodes = adjacencyMatrix.length;
+
+        for (int i = 0; i < numNodes; i++) {
+            nodes.add(new Point((i + 1) * 50, 200));
+        }
+
+        for (int i = 0; i < numNodes; i++) {
+            for (int j = 0; j < numNodes; j++) {
+                if (adjacencyMatrix[i][j] != 0) {
+                    edges.add(new Edge(nodes.get(i), nodes.get(j), adjacencyMatrix[i][j]));
+                }
+            }
+        }
+
+        repaint();
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         
         // Draw nodes
-        int nodeSize = 20; // New size for nodes
+        int nodeSize = 20;
         for (Point node : nodes) {
             g.setColor(Color.BLUE);
-            g.fillOval(node.x - nodeSize / 2, node.y - nodeSize / 2, nodeSize, nodeSize); // Adjust size here
+            g.fillOval(node.x - nodeSize / 2, node.y - nodeSize / 2, nodeSize, nodeSize);
         }
 
         // Draw edges
@@ -236,7 +237,7 @@ public class GraphPanel extends JPanel {
         public Edge(Point start, Point end) {
             this.start = start;
             this.end = end;
-            this.weight = 1; // Default weight
+            this.weight = 1;
         }
 
         public Edge(Point start, Point end, int weight) {

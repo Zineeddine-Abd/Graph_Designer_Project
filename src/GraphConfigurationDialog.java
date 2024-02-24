@@ -4,10 +4,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class GraphConfigurationDialog extends JDialog {
+	
     private boolean directed;
     private boolean weighted;
 
     public GraphConfigurationDialog() {
+    	
         setTitle("Graph Configuration");
         setSize(300, 150);
         setModal(true);

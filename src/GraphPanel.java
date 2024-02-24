@@ -6,26 +6,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GraphPanel extends JPanel {
+	
+	//------------------------------------------------------------
+	//because there is only two modes "add node" and "add edges"
     private enum Mode { ADD_NODE, ADD_EDGE }
 
     private List<Point> nodes = new ArrayList<>();
     private List<Edge> edges = new ArrayList<>();
+    
     private Point selectedNode1 = null;
     private Point selectedNode2 = null;
+    
     private Mode mode = Mode.ADD_NODE;
+    
     private boolean directed = false;
     private boolean weighted = false;
+    
     private JLabel weightLabel;
     private JTextField weightTextField;
 
     private boolean weightEntered = false;
+    
+    //------------------------------------------------------------
 
     public GraphPanel(boolean directed, boolean weighted) {
+    	
         this.directed = directed;
         this.weighted = weighted;
 
         setLayout(null);
-
+        
+        //to display the user choices in the GraphPanel
+        /*
         // Add radio buttons for selecting graph type
         JRadioButton directedButton = new JRadioButton("Directed");
         directedButton.setBounds(10, 10, 100, 30);
@@ -45,13 +57,14 @@ public class GraphPanel extends JPanel {
         weightedCheckBox.setSelected(weighted);
         weightedCheckBox.setEnabled(false);
         add(weightedCheckBox);
-
+        
         ButtonGroup group = new ButtonGroup();
         group.add(directedButton);
         group.add(undirectedButton);
-
+		*/
+        
         JButton addNodeButton = new JButton("Add Node");
-        addNodeButton.setBounds(10, 90, 100, 30);
+        addNodeButton.setBounds(10, 20, 100, 30);
         addNodeButton.addActionListener(e -> {
             mode = Mode.ADD_NODE;
             repaint();
@@ -59,7 +72,7 @@ public class GraphPanel extends JPanel {
         add(addNodeButton);
 
         JButton addEdgeButton = new JButton("Add Edge");
-        addEdgeButton.setBounds(120, 90, 100, 30);
+        addEdgeButton.setBounds(120, 20, 100, 30);
         addEdgeButton.addActionListener(e -> {
             mode = Mode.ADD_EDGE;
             selectedNode1 = null;
@@ -75,12 +88,12 @@ public class GraphPanel extends JPanel {
 
         if (weighted) {
             weightLabel = new JLabel("Weight:");
-            weightLabel.setBounds(230, 90, 60, 30);
+            weightLabel.setBounds(230, 20, 60, 30);
             weightLabel.setVisible(false);
             add(weightLabel);
 
             weightTextField = new JTextField();
-            weightTextField.setBounds(290, 90, 50, 30);
+            weightTextField.setBounds(290, 20, 50, 30);
             weightTextField.setVisible(false);
             weightTextField.addActionListener(e -> {
                 weightEntered = true;

@@ -4,6 +4,8 @@ import javax.swing.*;
 
 import javax.swing.*;
 
+import javax.swing.*;
+
 public class GraphDesigner extends JFrame {
 
     public GraphDesigner(boolean directed, boolean weighted) {
@@ -14,7 +16,7 @@ public class GraphDesigner extends JFrame {
         GraphPanel graphPanel = new GraphPanel(directed, weighted);
         add(graphPanel);
 
-        setVisible(true);
+        setVisible(true); // Make the frame visible before calling createGraphFromAdjacencyMatrix
     }
 
     // Updated constructor to accommodate adjacency matrix
@@ -24,9 +26,11 @@ public class GraphDesigner extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         GraphPanel graphPanel = new GraphPanel(directed, weighted);
-        graphPanel.createGraphFromAdjacencyMatrix(adjacencyMatrix); // Create graph from adjacency matrix
         add(graphPanel);
 
+        // Make the frame visible before calling createGraphFromAdjacencyMatrix
         setVisible(true);
+        
+        graphPanel.createGraphFromAdjacencyMatrix(adjacencyMatrix); // Create graph from adjacency matrix
     }
 }

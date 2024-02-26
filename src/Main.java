@@ -6,6 +6,9 @@ import javax.swing.*;
 import javax.swing.*;
 import java.awt.*;
 
+import javax.swing.*;
+import java.awt.*;
+
 public class Main {
 
     public static void main(String[] args) {
@@ -21,28 +24,31 @@ public class Main {
             dialog.dispose(); // Dispose the dialog after retrieving configuration
 
             if (useMatrix) {
-                // Show dialog to input adjacency matrix and edge weights
+                // Show dialog to input adjacency matrix, node names, and edge weights
                 JTextField dimensionField = new JTextField(5);
                 JTextField matrixField = new JTextField(20);
-                JTextField weightField = new JTextField(20); // New text field for edge weights
+                JTextField weightField = new JTextField(20); // Text field for edge weights
+                JTextField nodeNameField = new JTextField(20); // Text field for node names
 
                 JPanel matrixPanel = new JPanel();
+                matrixPanel.setLayout(new GridLayout(4, 2));
                 matrixPanel.add(new JLabel("Matrix Dimension:"));
                 matrixPanel.add(dimensionField);
-                matrixPanel.add(Box.createHorizontalStrut(15));
                 matrixPanel.add(new JLabel("Adjacency Matrix (comma-separated):"));
                 matrixPanel.add(matrixField);
-                matrixPanel.add(Box.createHorizontalStrut(15));
+                matrixPanel.add(new JLabel("Node Names (comma-separated):"));
+                matrixPanel.add(nodeNameField);
                 matrixPanel.add(new JLabel("Edge Weights (comma-separated):")); // Label for edge weights
                 matrixPanel.add(weightField); // Text field for edge weights
 
                 int result = JOptionPane.showConfirmDialog(null, matrixPanel,
-                        "Enter Adjacency Matrix and Edge Weights", JOptionPane.OK_CANCEL_OPTION);
+                        "Enter Adjacency Matrix, Node Names, and Edge Weights", JOptionPane.OK_CANCEL_OPTION);
                 if (result == JOptionPane.OK_OPTION) {
                     try {
                         int dimension = Integer.parseInt(dimensionField.getText());
                         String[] matrixValues = matrixField.getText().split(",");
                         String[] weightValues = weightField.getText().split(","); // New text field for edge weights
+                        String[] nodeNames = nodeNameField.getText().split(","); // New text field for node names
                         int[][] adjacencyMatrix = new int[dimension][dimension];
                         int index = 0;
                         for (int i = 0; i < dimension; i++) {
@@ -54,13 +60,13 @@ public class Main {
 
                         // Create and display the main frame with adjacency matrix
                         SwingUtilities.invokeLater(() -> {
-                            GraphDesigner graphDesigner = new GraphDesigner(directed, weighted, adjacencyMatrix, weightValues);
+                            GraphDesigner graphDesigner = new GraphDesigner(directed, weighted, adjacencyMatrix, nodeNames, weightValues);
                             centerFrame(graphDesigner); // Center the main frame
                             graphDesigner.setVisible(true);
                         });
 
                     } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-                        JOptionPane.showMessageDialog(null, "Invalid input. Please enter valid adjacency matrix and edge weights.");
+                        JOptionPane.showMessageDialog(null, "Invalid input. Please enter valid adjacency matrix, node names, and edge weights.");
                     }
                 }
             } else {

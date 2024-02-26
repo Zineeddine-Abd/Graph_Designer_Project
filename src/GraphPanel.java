@@ -5,11 +5,13 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.*;
@@ -17,47 +19,58 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class GraphPanel extends JPanel {
 
     private enum Mode { ADD_NODE, ADD_EDGE }
+    private Mode mode = Mode.ADD_NODE;
 
     private List<Point> nodes = new ArrayList<>();
     private List<Edge> edges = new ArrayList<>();
+    private HashMap<Point, String> nodeNames = new HashMap<>(); // Store node names
     
     private Point selectedNode1 = null;
     private Point selectedNode2 = null;
-    
-    private Mode mode = Mode.ADD_NODE;
     
     private boolean directed = false;
     private boolean weighted = false;
     
     private JLabel weightLabel;
     private JTextField weightTextField;
+    private JTextField nodeNameTextField; // Text field for node name
     private boolean weightEntered = false;
+    
+    private JButton addNodeButton; // Button for adding nodes
 
     public GraphPanel(boolean directed, boolean weighted) {
+    	
         this.directed = directed;
         this.weighted = weighted;
 
         setLayout(null);
-
-        JButton addNodeButton = new JButton("Add Node");
+        
+        // Button to add node
+        addNodeButton = new JButton("Add Node");
         addNodeButton.setBounds(10, 20, 100, 30);
+        addNodeButton.setEnabled(false); // Initially disabled
         addNodeButton.addActionListener(e -> {
+        	
             mode = Mode.ADD_NODE;
             repaint();
         });
         add(addNodeButton);
-
+        
+        // Button to add edge
         JButton addEdgeButton = new JButton("Add Edge");
         addEdgeButton.setBounds(120, 20, 100, 30);
         addEdgeButton.addActionListener(e -> {
+        	
             mode = Mode.ADD_EDGE;
             selectedNode1 = null;
             selectedNode2 = null;
+            
             if (weighted) {
                 weightLabel.setVisible(true);
                 weightTextField.setVisible(true);
@@ -66,15 +79,38 @@ public class GraphPanel extends JPanel {
             repaint();
         });
         add(addEdgeButton);
+        
+        // Text field and label for node name
+        JLabel nodeNameLabel = new JLabel("Node Name:");
+        nodeNameLabel.setBounds(230, 20, 80, 30);
+        add(nodeNameLabel);
+        
+        nodeNameTextField = new JTextField();
+        nodeNameTextField.setBounds(320, 20, 100, 30);
+        nodeNameTextField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            @Override
+            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                checkNodeName();
+            }
+            @Override
+            public void removeUpdate(javax.swing.event.DocumentEvent e) {
+                checkNodeName();
+            }
+            @Override
+            public void changedUpdate(javax.swing.event.DocumentEvent e) {
+                checkNodeName();
+            }
+        });
+        add(nodeNameTextField);
 
         if (weighted) {
             weightLabel = new JLabel("Weight:");
-            weightLabel.setBounds(230, 20, 60, 30);
+            weightLabel.setBounds(430, 20, 60, 30);
             weightLabel.setVisible(false);
             add(weightLabel);
 
             weightTextField = new JTextField();
-            weightTextField.setBounds(290, 20, 50, 30);
+            weightTextField.setBounds(500, 20, 50, 30);
             weightTextField.setVisible(false);
             weightTextField.addActionListener(e -> {
                 weightEntered = true;
@@ -84,8 +120,10 @@ public class GraphPanel extends JPanel {
         }
 
         addMouseListener(new MouseAdapter() {
+        	
             @Override
             public void mouseClicked(MouseEvent e) {
+            	
                 super.mouseClicked(e);
                 Point clickedPoint = e.getPoint();
                 switch (mode) {
@@ -105,13 +143,17 @@ public class GraphPanel extends JPanel {
             }
         });
     }
-
+    
     private void addNode(Point point) {
         nodes.add(point);
+        String nodeName = nodeNameTextField.getText(); // Get node name from text field
+        nodeNames.put(point, nodeName); // Store node name corresponding to its coordinate
+        nodeNameTextField.setText(""); // Clear the text field
         repaint();
     }
 
     private void selectNodesForEdge(Point point) {
+    	
         for (Point node : nodes) {
             if (node.distance(point) < 10) {
                 if (selectedNode1 == null) {
@@ -144,6 +186,7 @@ public class GraphPanel extends JPanel {
     }
 
     private void addEdge() {
+    	
         if (selectedNode1 != null && selectedNode2 != null && !weightEntered) {
             String weightStr = weightTextField.getText();
             int weight = 1;
@@ -162,25 +205,34 @@ public class GraphPanel extends JPanel {
         }
     }
 
+    // Method to check if the node name text field is empty
+    private void checkNodeName() {
+        if (nodeNameTextField.getText().isEmpty()) {
+            addNodeButton.setEnabled(false); // Disable add node button
+        } else {
+            addNodeButton.setEnabled(true); // Enable add node button
+        }
+    }
 
- // Method to create graph from adjacency matrix with distributed nodes
-    public void createGraphFromAdjacencyMatrix(int[][] adjacencyMatrix) {
+    // Method to create graph from adjacency matrix with distributed nodes
+    public void createGraphFromAdjacencyMatrix(int[][] adjacencyMatrix, String[] edgeWeights) {
     	
         nodes.clear();
         edges.clear();
+        nodeNames.clear(); // Clear node names
         
         int numNodes = adjacencyMatrix.length;
-        
+         
         // Calculate center of the panel
         int centerX = getWidth() / 2;
         int centerY = getHeight() / 2;
-        
+         
         // Calculate the maximum distance from the center to the edge of the panel
         int maxDistance = Math.min(centerX, centerY) * 2/5; // Adjust the maximum distance as needed ("2/5" : increase = increase distance , decrease = decrease distance)
-        
+         
         // Calculate the angle between nodes
         double angleIncrement = 2 * Math.PI / numNodes;
-        
+         
         // Calculate the position of each node
         for (int i = 0; i < numNodes; i++) {
             double angle = angleIncrement * i;
@@ -189,11 +241,14 @@ public class GraphPanel extends JPanel {
             nodes.add(new Point(x, y));
         }
 
-        // Create edges based on the adjacency matrix
+        // Create edges based on the adjacency matrix and edge weights
+        int index = 0;
         for (int i = 0; i < numNodes; i++) {
             for (int j = 0; j < numNodes; j++) {
                 if (adjacencyMatrix[i][j] != 0) {
-                    edges.add(new Edge(nodes.get(i), nodes.get(j), adjacencyMatrix[i][j]));
+                    int weight = Integer.parseInt(edgeWeights[index]);
+                    edges.add(new Edge(nodes.get(i), nodes.get(j), weight));
+                    index++;
                 }
             }
         }
@@ -204,13 +259,19 @@ public class GraphPanel extends JPanel {
 
     @Override
     protected void paintComponent(Graphics g) {
+    	
         super.paintComponent(g);
         
-        // Draw nodes
+        // Draw nodes and node names
         int nodeSize = 20;
         for (Point node : nodes) {
             g.setColor(Color.BLUE);
             g.fillOval(node.x - nodeSize / 2, node.y - nodeSize / 2, nodeSize, nodeSize);
+            String nodeName = nodeNames.get(node);
+            if (nodeName != null) {
+                g.setColor(Color.BLACK);
+                g.drawString(nodeName, node.x - nodeName.length() * 3, node.y + 5);
+            }
         }
 
         // Draw edges
@@ -247,6 +308,7 @@ public class GraphPanel extends JPanel {
     }
 
     private static class Edge {
+    	
         private final Point start;
         private final Point end;
         private final int weight;
@@ -254,7 +316,7 @@ public class GraphPanel extends JPanel {
         public Edge(Point start, Point end) {
             this.start = start;
             this.end = end;
-            this.weight = 1;
+            this.weight = 1; //default weight == 1
         }
 
         public Edge(Point start, Point end, int weight) {

@@ -20,6 +20,7 @@ public class GraphConfigurationDialog extends JDialog {
     private boolean useMatrix; // Add a boolean field to indicate whether to use adjacency matrix
 
     public GraphConfigurationDialog() {
+    	
         setTitle("Graph Configuration");
         setSize(300, 150);
         setModal(true);
@@ -48,12 +49,13 @@ public class GraphConfigurationDialog extends JDialog {
 
         JButton saveButton = new JButton("Save");
         saveButton.addActionListener(new ActionListener() {
-            @Override
+            
+        	@Override
             public void actionPerformed(ActionEvent e) {
                 directed = directedCheckBox.isSelected();
                 weighted = weightedCheckBox.isSelected();
                 useMatrix = matrixCheckBox.isSelected(); // Set the value of useMatrix
-                dispose();
+                dispose();// close the container wich is the JDialog after hitting save
             }
         });
 

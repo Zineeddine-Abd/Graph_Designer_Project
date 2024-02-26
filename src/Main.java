@@ -2,11 +2,6 @@ import javax.swing.*;
 import java.awt.*;
 
 import javax.swing.*;
-
-import javax.swing.*;
-import java.awt.*;
-
-import javax.swing.*;
 import java.awt.*;
 
 public class Main {
@@ -24,31 +19,43 @@ public class Main {
             dialog.dispose(); // Dispose the dialog after retrieving configuration
 
             if (useMatrix) {
-                // Show dialog to input adjacency matrix, node names, and edge weights
+                // Show dialog to input adjacency matrix and node names
                 JTextField dimensionField = new JTextField(5);
                 JTextField matrixField = new JTextField(20);
-                JTextField weightField = new JTextField(20); // Text field for edge weights
                 JTextField nodeNameField = new JTextField(20); // Text field for node names
+                JTextField weightField = null;
 
                 JPanel matrixPanel = new JPanel();
-                matrixPanel.setLayout(new GridLayout(4, 2));
+                matrixPanel.setLayout(new BoxLayout(matrixPanel, BoxLayout.Y_AXIS));
                 matrixPanel.add(new JLabel("Matrix Dimension:"));
                 matrixPanel.add(dimensionField);
+                matrixPanel.add(Box.createVerticalStrut(10));
                 matrixPanel.add(new JLabel("Adjacency Matrix (comma-separated):"));
                 matrixPanel.add(matrixField);
+                matrixPanel.add(Box.createVerticalStrut(10));
                 matrixPanel.add(new JLabel("Node Names (comma-separated):"));
                 matrixPanel.add(nodeNameField);
-                matrixPanel.add(new JLabel("Edge Weights (comma-separated):")); // Label for edge weights
-                matrixPanel.add(weightField); // Text field for edge weights
+
+                if (weighted) {
+                    weightField = new JTextField(20);
+                    matrixPanel.add(Box.createVerticalStrut(10));
+                    matrixPanel.add(new JLabel("Edge Weights (comma-separated):"));
+                    matrixPanel.add(weightField); // Text field for edge weights
+                }
 
                 int result = JOptionPane.showConfirmDialog(null, matrixPanel,
-                        "Enter Adjacency Matrix, Node Names, and Edge Weights", JOptionPane.OK_CANCEL_OPTION);
+                        "Enter Adjacency Matrix and Node Names", JOptionPane.OK_CANCEL_OPTION);
                 if (result == JOptionPane.OK_OPTION) {
                     try {
                         int dimension = Integer.parseInt(dimensionField.getText());
                         String[] matrixValues = matrixField.getText().split(",");
-                        String[] weightValues = weightField.getText().split(","); // New text field for edge weights
-                        String[] nodeNames = nodeNameField.getText().split(","); // New text field for node names
+                        String[] nodeNames = nodeNameField.getText().split(","); // Get node names
+                        String[] edgeWeights = null;
+
+                        if (weighted) {
+                            edgeWeights = weightField.getText().split(","); // Get edge weights
+                        }
+
                         int[][] adjacencyMatrix = new int[dimension][dimension];
                         int index = 0;
                         for (int i = 0; i < dimension; i++) {
@@ -59,8 +66,14 @@ public class Main {
                         }
 
                         // Create and display the main frame with adjacency matrix
+                        final String[] finalEdgeWeights = edgeWeights; // Create final variable to hold edgeWeights
                         SwingUtilities.invokeLater(() -> {
-                            GraphDesigner graphDesigner = new GraphDesigner(directed, weighted, adjacencyMatrix, nodeNames, weightValues);
+                            GraphDesigner graphDesigner;
+                            if (weighted) {
+                                graphDesigner = new GraphDesigner(directed, weighted, adjacencyMatrix, nodeNames, finalEdgeWeights);
+                            } else {
+                                graphDesigner = new GraphDesigner(directed, weighted, adjacencyMatrix, nodeNames);
+                            }
                             centerFrame(graphDesigner); // Center the main frame
                             graphDesigner.setVisible(true);
                         });

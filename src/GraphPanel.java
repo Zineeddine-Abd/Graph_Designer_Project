@@ -262,6 +262,52 @@ public class GraphPanel extends JPanel {
 
         repaint();
     }
+    
+    
+ // Method to create graph from adjacency matrix with distributed nodes and node names
+    public void createGraphFromAdjacencyMatrix(int[][] adjacencyMatrix, String[] nodeNames) {
+        nodes.clear();
+        edges.clear();
+        this.nodeNames.clear(); // Clear node names
+
+        int numNodes = adjacencyMatrix.length;
+
+        // Calculate center of the panel
+        int centerX = getWidth() / 2;
+        int centerY = getHeight() / 2;
+
+        // Calculate the maximum distance from the center to the edge of the panel
+        int maxDistance = Math.min(centerX, centerY) * 2 / 5; // Adjust the maximum distance as needed
+
+        // Calculate the angle between nodes
+        double angleIncrement = 2 * Math.PI / numNodes;
+
+        // Calculate the position of each node
+        for (int i = 0; i < numNodes; i++) {
+            double angle = angleIncrement * i;
+            int x = (int) (centerX + maxDistance * Math.cos(angle));
+            int y = (int) (centerY + maxDistance * Math.sin(angle));
+            nodes.add(new Point(x, y));
+        }
+
+        // Store node names
+        for (String nodeName : nodeNames) {
+            this.nodeNames.add(nodeName);
+        }
+
+        // Create edges based on the adjacency matrix and edge weights
+        for (int i = 0; i < numNodes; i++) {
+            for (int j = 0; j < numNodes; j++) {
+                if (adjacencyMatrix[i][j] != 0) {
+                    edges.add(new Edge(nodes.get(i), nodes.get(j)));
+                }
+            }
+        }
+
+        repaint();
+    }
+    
+    
 
     @Override
     protected void paintComponent(Graphics g) {

@@ -58,6 +58,8 @@ public class GraphPanel extends JPanel {
 
     private JButton addNodeButton;
     private boolean addNodeClicked = false;
+    private JButton generateMatrixButton;
+
 
     public GraphPanel(boolean directed, boolean weighted) {
         this.directed = directed;
@@ -90,6 +92,14 @@ public class GraphPanel extends JPanel {
             repaint();
         });
         add(addEdgeButton);
+        
+        generateMatrixButton = new JButton("Generate Adjacency Matrix");
+        generateMatrixButton.setBounds(10, 60, 200, 30);
+        generateMatrixButton.addActionListener(e -> {
+            generateAndDisplayAdjacencyMatrix();
+        });
+        add(generateMatrixButton);
+    	
 
         JLabel nodeNameLabel = new JLabel("Node Name:");
         nodeNameLabel.setBounds(230, 20, 80, 30);
@@ -130,6 +140,9 @@ public class GraphPanel extends JPanel {
             });
             add(weightTextField);
         }
+        
+        
+        
 
         addMouseListener(new MouseAdapter() {
         	@Override
@@ -156,6 +169,7 @@ public class GraphPanel extends JPanel {
 
         });
     }
+    
 
     private void addNode(Point point) {
         String nodeName = nodeNameTextField.getText();
@@ -301,6 +315,32 @@ public class GraphPanel extends JPanel {
 
         repaint();
     }
+    
+    
+    private void generateAndDisplayAdjacencyMatrix() {
+        int numNodes = nodes.size();
+        int[][] adjacencyMatrix = new int[numNodes][numNodes];
+
+        // Populate the adjacency matrix based on the edges
+        for (Edge edge : edges) {
+            int startIndex = nodes.indexOf(edge.getStart());
+            int endIndex = nodes.indexOf(edge.getEnd());
+            adjacencyMatrix[startIndex][endIndex] = 1;
+            if (!directed) {
+                adjacencyMatrix[endIndex][startIndex] = 1;
+            }
+        }
+
+        // Display the adjacency matrix
+        StringBuilder matrixText = new StringBuilder("Adjacency Matrix:\n");
+        for (int i = 0; i < numNodes; i++) {
+            for (int j = 0; j < numNodes; j++) {
+                matrixText.append(adjacencyMatrix[i][j]).append(" ");
+            }
+            matrixText.append("\n");
+        }
+        JOptionPane.showMessageDialog(this, matrixText.toString(), "Adjacency Matrix", JOptionPane.PLAIN_MESSAGE);
+    }
 
 
     @Override
@@ -399,6 +439,18 @@ class Edge {
         this.start = start;
         this.end = end;
         this.weight = weight;
+    }
+    
+    Node getStart() {
+    	return start;
+    }
+    
+    Node getEnd() {
+    	return end;
+    }
+    
+    int getWeight() {
+    	return weight;
     }
 
     public void draw(Graphics g, boolean weighted, boolean directed) {

@@ -18,6 +18,7 @@ public class GraphConfigurationDialog extends JDialog {
     private boolean directed;
     private boolean weighted;
     private boolean useMatrix;
+    
 
     public GraphConfigurationDialog() {
     	

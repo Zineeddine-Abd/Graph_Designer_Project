@@ -30,27 +30,34 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
+
 public class GraphPanel extends JPanel {
 
     private enum Mode { ADD_NODE, ADD_EDGE }
     private Mode mode = Mode.ADD_NODE;
 
-    private List<Point> nodes = new ArrayList<>();
+    private List<Node> nodes = new ArrayList<>();
     private List<Edge> edges = new ArrayList<>();
-    private List<String> nodeNames = new ArrayList<>(); // Store node names
 
-    private Point selectedNode1 = null;
-    private Point selectedNode2 = null;
+    private Node selectedNode1 = null;
+    private Node selectedNode2 = null;
 
     private boolean directed = false;
     private boolean weighted = false;
 
     private JLabel weightLabel;
     private JTextField weightTextField;
-    private JTextField nodeNameTextField; // Text field for node name
+    private JTextField nodeNameTextField;
     private boolean weightEntered = false;
 
-    private JButton addNodeButton; // Button for adding nodes
+    private JButton addNodeButton;
+    private boolean addNodeClicked = false;
 
     public GraphPanel(boolean directed, boolean weighted) {
         this.directed = directed;
@@ -58,17 +65,16 @@ public class GraphPanel extends JPanel {
 
         setLayout(null);
 
-        // Button to add node
         addNodeButton = new JButton("Add Node");
         addNodeButton.setBounds(10, 20, 100, 30);
-        addNodeButton.setEnabled(false); // Initially disabled
+        addNodeButton.setEnabled(false);
         addNodeButton.addActionListener(e -> {
             mode = Mode.ADD_NODE;
+            addNodeClicked = true;
             repaint();
         });
         add(addNodeButton);
 
-        // Button to add edge
         JButton addEdgeButton = new JButton("Add Edge");
         addEdgeButton.setBounds(120, 20, 100, 30);
         addEdgeButton.addActionListener(e -> {
@@ -85,7 +91,6 @@ public class GraphPanel extends JPanel {
         });
         add(addEdgeButton);
 
-        // Text field and label for node name
         JLabel nodeNameLabel = new JLabel("Node Name:");
         nodeNameLabel.setBounds(230, 20, 80, 30);
         add(nodeNameLabel);
@@ -127,39 +132,43 @@ public class GraphPanel extends JPanel {
         }
 
         addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                super.mouseClicked(e);
-                Point clickedPoint = e.getPoint();
-                switch (mode) {
-                    case ADD_NODE:
-                        addNode(clickedPoint);
-                        break;
-                    case ADD_EDGE:
-                        if (weighted) {
-                            if (weightEntered) {
-                                selectNodesForEdge(clickedPoint);
-                            }
-                        } else {
-                            selectNodesForEdge(clickedPoint);
-                        }
-                        break;
-                }
-            }
+        	@Override
+        	public void mouseClicked(MouseEvent e) {
+        	    super.mouseClicked(e);
+        	    Point clickedPoint = e.getPoint();
+        	    switch (mode) {
+        	        case ADD_NODE:
+        	            if (!nodeNameTextField.getText().isEmpty() && addNodeClicked == true) {
+        	                addNode(clickedPoint);
+        	            }
+        	            break;
+        	        case ADD_EDGE:
+        	            if (weighted) {
+        	                if (weightEntered) {
+        	                    selectNodesForEdge(clickedPoint);
+        	                }
+        	            } else {
+        	                selectNodesForEdge(clickedPoint);
+        	            }
+        	            break;
+        	    }
+        	}
+
         });
     }
 
     private void addNode(Point point) {
-        nodes.add(point);
-        String nodeName = nodeNameTextField.getText(); // Get node name from text field
-        nodeNames.add(nodeName); // Store node name
-        nodeNameTextField.setText(""); // Clear the text field
+        String nodeName = nodeNameTextField.getText();
+        Node newNode = new Node(point, nodeName);
+        nodes.add(newNode);
+        nodeNameTextField.setText("");
+        checkNodeName();
         repaint();
     }
 
     private void selectNodesForEdge(Point point) {
-        for (Point node : nodes) {
-            if (node.distance(point) < 10) {
+        for (Node node : nodes) {
+            if (node.contains(point)) {
                 if (selectedNode1 == null) {
                     selectedNode1 = node;
                 } else if (selectedNode2 == null && !selectedNode1.equals(node)) {
@@ -208,21 +217,19 @@ public class GraphPanel extends JPanel {
         }
     }
 
-    // Method to check if the node name text field is empty
     private void checkNodeName() {
         if (nodeNameTextField.getText().isEmpty()) {
-            addNodeButton.setEnabled(false); // Disable add node button
+            addNodeButton.setEnabled(false);
         } else {
-            addNodeButton.setEnabled(true); // Enable add node button
+            addNodeButton.setEnabled(true);
         }
     }
-
-    // Method to create graph from adjacency matrix with distributed nodes and node names
+    
+ // Method to create graph from adjacency matrix with distributed nodes and node names and edge weights
     public void createGraphFromAdjacencyMatrix(int[][] adjacencyMatrix, String[] nodeNames, String[] edgeWeights) {
         nodes.clear();
         edges.clear();
-        this.nodeNames.clear(); // Clear node names
-
+   
         int numNodes = adjacencyMatrix.length;
 
         // Calculate center of the panel
@@ -235,17 +242,12 @@ public class GraphPanel extends JPanel {
         // Calculate the angle between nodes
         double angleIncrement = 2 * Math.PI / numNodes;
 
-        // Calculate the position of each node
+        // Calculate the position of each node and create nodes
         for (int i = 0; i < numNodes; i++) {
             double angle = angleIncrement * i;
             int x = (int) (centerX + maxDistance * Math.cos(angle));
             int y = (int) (centerY + maxDistance * Math.sin(angle));
-            nodes.add(new Point(x, y));
-        }
-
-        // Store node names
-        for (String nodeName : nodeNames) {
-            this.nodeNames.add(nodeName);
+            nodes.add(new Node(new Point(x, y), nodeNames[i]));
         }
 
         // Create edges based on the adjacency matrix and edge weights
@@ -262,13 +264,11 @@ public class GraphPanel extends JPanel {
 
         repaint();
     }
-    
-    
- // Method to create graph from adjacency matrix with distributed nodes and node names
+
+    // Method to create graph from adjacency matrix with distributed nodes and node names
     public void createGraphFromAdjacencyMatrix(int[][] adjacencyMatrix, String[] nodeNames) {
         nodes.clear();
         edges.clear();
-        this.nodeNames.clear(); // Clear node names
 
         int numNodes = adjacencyMatrix.length;
 
@@ -282,20 +282,15 @@ public class GraphPanel extends JPanel {
         // Calculate the angle between nodes
         double angleIncrement = 2 * Math.PI / numNodes;
 
-        // Calculate the position of each node
+        // Calculate the position of each node and create nodes
         for (int i = 0; i < numNodes; i++) {
             double angle = angleIncrement * i;
             int x = (int) (centerX + maxDistance * Math.cos(angle));
             int y = (int) (centerY + maxDistance * Math.sin(angle));
-            nodes.add(new Point(x, y));
+            nodes.add(new Node(new Point(x, y), nodeNames[i]));
         }
 
-        // Store node names
-        for (String nodeName : nodeNames) {
-            this.nodeNames.add(nodeName);
-        }
-
-        // Create edges based on the adjacency matrix and edge weights
+        // Create edges based on the adjacency matrix
         for (int i = 0; i < numNodes; i++) {
             for (int j = 0; j < numNodes; j++) {
                 if (adjacencyMatrix[i][j] != 0) {
@@ -306,87 +301,133 @@ public class GraphPanel extends JPanel {
 
         repaint();
     }
-    
-    
+
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        // Draw nodes and node names
-        int nodeSize = 20;
-        for (int i = 0; i < nodes.size(); i++) {
-            Point node = nodes.get(i);
-            g.setColor(Color.BLUE);
-            g.fillOval(node.x - nodeSize / 2, node.y - nodeSize / 2, nodeSize, nodeSize);
-            String nodeName = nodeNames.get(i);
-            if (nodeName != null) {
-                g.setColor(Color.BLACK);
-                g.drawString(nodeName, node.x - nodeName.length() * 3, node.y + 5);
-            }
+        for (Edge edge : edges) {
+            edge.draw(g, weighted, directed);
         }
 
-        // Draw edges
-        for (Edge edge : edges) {
-            g.setColor(Color.BLACK);
-            g.drawLine(edge.getStart().x, edge.getStart().y, edge.getEnd().x, edge.getEnd().y);
-            if (weighted) {
-                g.drawString(String.valueOf(edge.getWeight()), (edge.getStart().x + edge.getEnd().x) / 2, (edge.getStart().y + edge.getEnd().y) / 2);
-            }
-            if (directed) {
-                drawArrow(g, edge.getStart(), edge.getEnd());
-            }
+        for (Node node : nodes) {
+            node.draw(g);
         }
-        // Draw selected nodes for edge creation
+
         if (selectedNode1 != null) {
             g.setColor(Color.RED);
-            g.fillOval(selectedNode1.x - 5, selectedNode1.y - 5, 10, 10);
+            g.fillOval(selectedNode1.getPoint().x - 5, selectedNode1.getPoint().y - 5, 10, 10);
         }
         if (selectedNode2 != null) {
             g.setColor(Color.RED);
-            g.fillOval(selectedNode2.x - 5, selectedNode2.y - 5, 10, 10);
+            g.fillOval(selectedNode2.getPoint().x - 5, selectedNode2.getPoint().y - 5, 10, 10);
+        }
+    }
+
+
+    public List<Node> getNodes() {
+        return nodes;
+    }
+
+    public List<Edge> getEdges() {
+        return edges;
+    }
+
+    public boolean isDirected() {
+        return directed;
+    }
+
+    public boolean isWeighted() {
+        return weighted;
+    }
+
+    public void setDirected(boolean directed) {
+        this.directed = directed;
+    }
+
+    public void setWeighted(boolean weighted) {
+        this.weighted = weighted;
+    }
+}
+
+class Node {
+    private Point point;
+    private String nodeName;
+
+    public Node(Point point, String nodeName) {
+        this.point = point;
+        this.nodeName = nodeName;
+    }
+
+    public Point getPoint() {
+        return point;
+    }
+
+    public String getNodeName() {
+        return nodeName;
+    }
+
+    public boolean contains(Point p) {
+        int tolerance = 10; // Adjust tolerance as needed
+        return (Math.abs(point.x - p.x) <= tolerance && Math.abs(point.y - p.y) <= tolerance);
+    }
+
+    public void draw(Graphics g) {
+        int nodeSize = 20;
+        g.setColor(Color.BLUE);
+        g.fillOval(point.x - nodeSize / 2, point.y - nodeSize / 2, nodeSize, nodeSize);
+        if (nodeName != null) {
+            g.setColor(Color.BLACK);
+            g.drawString(nodeName, point.x - nodeName.length() * 3, point.y + 5);
+        }
+    }
+}
+
+class Edge {
+    private Node start;
+    private Node end;
+    private int weight;
+
+    public Edge(Node start, Node end) {
+        this.start = start;
+        this.end = end;
+        this.weight = 1; // Default weight == 1
+    }
+
+    public Edge(Node start, Node end, int weight) {
+        this.start = start;
+        this.end = end;
+        this.weight = weight;
+    }
+
+    public void draw(Graphics g, boolean weighted, boolean directed) {
+        g.setColor(Color.BLACK);
+        g.drawLine(start.getPoint().x, start.getPoint().y, end.getPoint().x, end.getPoint().y);
+        if (weighted) {
+            // Draw weight at the midpoint of the edge
+            int midX = (start.getPoint().x + end.getPoint().x) / 2;
+            int midY = (start.getPoint().y + end.getPoint().y) / 2;
+            g.drawString(String.valueOf(weight), midX, midY);
+        }
+        if (directed) {
+            drawArrow(g, start.getPoint(), end.getPoint());
         }
     }
 
     private void drawArrow(Graphics g, Point start, Point end) {
         double angle = Math.atan2(end.y - start.y, end.x - start.x);
         int arrowSize = 10;
-        int x1 = (int) (end.x - arrowSize * Math.cos(angle - Math.PI / 6));
-        int y1 = (int) (end.y - arrowSize * Math.sin(angle - Math.PI / 6));
-        int x2 = (int) (end.x - arrowSize * Math.cos(angle + Math.PI / 6));
-        int y2 = (int) (end.y - arrowSize * Math.sin(angle + Math.PI / 6));
+        int arrowX = (int) (end.x - arrowSize * Math.cos(angle));
+        int arrowY = (int) (end.y - arrowSize * Math.sin(angle));
+        int x1 = (int) (arrowX - arrowSize * Math.cos(angle - Math.PI / 6));
+        int y1 = (int) (arrowY - arrowSize * Math.sin(angle - Math.PI / 6));
+        int x2 = (int) (arrowX - arrowSize * Math.cos(angle + Math.PI / 6));
+        int y2 = (int) (arrowY - arrowSize * Math.sin(angle + Math.PI / 6));
         g.drawLine(end.x, end.y, x1, y1);
         g.drawLine(end.x, end.y, x2, y2);
     }
 
-    private static class Edge {
 
-        private final Point start;
-        private final Point end;
-        private final int weight;
-
-        public Edge(Point start, Point end) {
-            this.start = start;
-            this.end = end;
-            this.weight = 1; //default weight == 1
-        }
-
-        public Edge(Point start, Point end, int weight) {
-            this.start = start;
-            this.end = end;
-            this.weight = weight;
-        }
-
-        public Point getStart() {
-            return start;
-        }
-
-        public Point getEnd() {
-            return end;
-        }
-
-        public int getWeight() {
-            return weight;
-        }
-    }
 }
+

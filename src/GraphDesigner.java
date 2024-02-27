@@ -20,18 +20,19 @@ public class GraphDesigner extends JFrame {
         initialize(directed, weighted);
     }
 
-    // Updated constructor to accommodate adjacency matrix, node names, and edge weights
+    
     public GraphDesigner(boolean directed, boolean weighted, int[][] adjacencyMatrix, String[] nodeNames, String[] edgeWeights) {
         initialize(directed, weighted);
-        graphPanel.createGraphFromAdjacencyMatrix(adjacencyMatrix, nodeNames, edgeWeights); // Create graph from adjacency matrix
+        graphPanel.createGraphFromAdjacencyMatrix(adjacencyMatrix, nodeNames, edgeWeights);
     }
     
-    // Updated constructor to accommodate adjacency matrix, node names, and edge weights
+    
     public GraphDesigner(boolean directed, boolean weighted, int[][] adjacencyMatrix, String[] nodeNames) {
         initialize(directed, weighted);
         graphPanel.createGraphFromAdjacencyMatrix(adjacencyMatrix, nodeNames); // Create graph from adjacency matrix
     }
 
+    //initialize the frame of the graph designer
     private void initialize(boolean directed, boolean weighted) {
         setTitle("Graph Designer");
         setSize(600, 400);

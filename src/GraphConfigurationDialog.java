@@ -17,7 +17,7 @@ public class GraphConfigurationDialog extends JDialog {
     
     private boolean directed;
     private boolean weighted;
-    private boolean useMatrix; // Add a boolean field to indicate whether to use adjacency matrix
+    private boolean useMatrix;
 
     public GraphConfigurationDialog() {
     	
@@ -26,7 +26,7 @@ public class GraphConfigurationDialog extends JDialog {
         setModal(true);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-        JPanel panel = new JPanel(new GridLayout(3, 2)); // Increase grid layout to accommodate new option
+        JPanel panel = new JPanel(new GridLayout(3, 2));
 
         JLabel directedLabel = new JLabel("Directed:");
         panel.add(directedLabel);
@@ -40,7 +40,6 @@ public class GraphConfigurationDialog extends JDialog {
         JCheckBox weightedCheckBox = new JCheckBox();
         panel.add(weightedCheckBox);
 
-        // Add checkbox for selecting whether to use adjacency matrix
         JLabel matrixLabel = new JLabel("Use Adjacency Matrix:");
         panel.add(matrixLabel);
 
@@ -48,13 +47,15 @@ public class GraphConfigurationDialog extends JDialog {
         panel.add(matrixCheckBox);
 
         JButton saveButton = new JButton("Save");
+        //Lamda expression
         saveButton.addActionListener(new ActionListener() {
             
         	@Override
             public void actionPerformed(ActionEvent e) {
+        		
                 directed = directedCheckBox.isSelected();
                 weighted = weightedCheckBox.isSelected();
-                useMatrix = matrixCheckBox.isSelected(); // Set the value of useMatrix
+                useMatrix = matrixCheckBox.isSelected();
                 dispose();// close the container wich is the JDialog after hitting save
             }
         });
@@ -72,6 +73,6 @@ public class GraphConfigurationDialog extends JDialog {
     }
 
     public boolean isUseMatrix() {
-        return useMatrix; // Return the value of useMatrix
+        return useMatrix; 
     }
 }

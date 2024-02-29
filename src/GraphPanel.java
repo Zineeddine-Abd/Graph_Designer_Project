@@ -414,10 +414,13 @@ public class GraphPanel extends JPanel {
 class Node {
     private Point point;
     private String nodeName;
+    private final Color color = Color.RED;
+    private final int size = 30;
 
     public Node(Point point, String nodeName) {
         this.point = point;
         this.nodeName = nodeName;
+        
     }
 
     public Point getPoint() {
@@ -427,6 +430,7 @@ class Node {
     public String getNodeName() {
         return nodeName;
     }
+    
 
     public boolean contains(Point p) {
         int tolerance = 10; // Adjust tolerance as needed
@@ -434,8 +438,8 @@ class Node {
     }
 
     public void draw(Graphics g) {
-        int nodeSize = 20;
-        g.setColor(Color.BLUE);
+        int nodeSize = size;
+        g.setColor(color);
         g.fillOval(point.x - nodeSize / 2, point.y - nodeSize / 2, nodeSize, nodeSize);
         if (nodeName != null) {
             g.setColor(Color.BLACK);
@@ -448,6 +452,8 @@ class Edge {
     private Node start;
     private Node end;
     private int weight;
+    private final Color color = Color.BLACK;
+    private final int thickness = 4;
 
     public Edge(Node start, Node end) {
         this.start = start;
@@ -474,7 +480,26 @@ class Edge {
     }
 
     public void draw(Graphics g, boolean weighted, boolean directed) {
-        g.setColor(Color.BLACK);
+        
+    	g.setColor(color);
+        
+    	//----------------------------------------
+        Graphics2D g2d = (Graphics2D) g;
+
+        // Save the original stroke
+        Stroke originalStroke = g2d.getStroke();
+
+        // Set the custom stroke thickness
+        g2d.setStroke(new BasicStroke(thickness));
+
+        // Draw the edge
+        g2d.setColor(color);
+        g2d.drawLine(start.getPoint().x, start.getPoint().y, end.getPoint().x, end.getPoint().y);
+        
+        // Restore the original stroke
+        g2d.setStroke(originalStroke);
+        //----------------------------------------
+        
         g.drawLine(start.getPoint().x, start.getPoint().y, end.getPoint().x, end.getPoint().y);
         if (weighted) {
             // Draw weight at the midpoint of the edge
@@ -483,11 +508,17 @@ class Edge {
             g.drawString(String.valueOf(weight), midX, midY);
         }
         if (directed) {
-            drawArrow(g, start.getPoint(), end.getPoint());
+            drawArrow(g2d, start.getPoint(), end.getPoint());
         }
     }
 
-    private void drawArrow(Graphics g, Point start, Point end) {
+    private void drawArrow(Graphics2D g2d, Point start, Point end) {
+    	// Save the original stroke
+        Stroke originalStroke = g2d.getStroke();
+
+        // Set the custom stroke thickness
+        g2d.setStroke(new BasicStroke(thickness));
+        
         double angle = Math.atan2(end.y - start.y, end.x - start.x);
         int arrowSize = 10;
         int arrowX = (int) (end.x - arrowSize * Math.cos(angle));
@@ -496,8 +527,11 @@ class Edge {
         int y1 = (int) (arrowY - arrowSize * Math.sin(angle - Math.PI / 6));
         int x2 = (int) (arrowX - arrowSize * Math.cos(angle + Math.PI / 6));
         int y2 = (int) (arrowY - arrowSize * Math.sin(angle + Math.PI / 6));
-        g.drawLine(end.x, end.y, x1, y1);
-        g.drawLine(end.x, end.y, x2, y2);
+        g2d.drawLine(end.x, end.y, x1, y1);
+        g2d.drawLine(end.x, end.y, x2, y2);
+        
+        // Restore the original stroke
+        g2d.setStroke(originalStroke);
     }
 
 

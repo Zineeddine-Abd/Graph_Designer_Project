@@ -45,4 +45,8 @@ public class GraphDesigner extends JFrame {
     }
 
     private GraphPanel graphPanel;
+    
+    public GraphPanel getGraphPanel() {
+        return graphPanel;
+    }
 }

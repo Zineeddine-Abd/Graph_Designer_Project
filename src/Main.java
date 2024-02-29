@@ -84,12 +84,14 @@ public class Main {
                     }
                 }
             } else {
-                // Proceed with manual graph creation
-                SwingUtilities.invokeLater(() -> {
-                    GraphDesigner graphDesigner = new GraphDesigner(directed, weighted);
-                    centerFrame(graphDesigner); // Center the main frame
-                    graphDesigner.setVisible(true);
-                });
+            	if(!dialog.isLoaded()) {
+	                // Proceed with manual graph creation
+	                SwingUtilities.invokeLater(() -> {
+	                    GraphDesigner graphDesigner = new GraphDesigner(directed, weighted);
+	                    centerFrame(graphDesigner); // Center the main frame
+	                    graphDesigner.setVisible(true);
+	                });
+            	}
             }
         });
     }

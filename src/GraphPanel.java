@@ -2,6 +2,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,28 +17,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.List;
 
 public class GraphPanel extends JPanel {
 
@@ -99,6 +80,11 @@ public class GraphPanel extends JPanel {
             generateAndDisplayAdjacencyMatrix();
         });
         add(generateMatrixButton);
+        
+        JButton saveGraphButton = new JButton("Save Graph");
+        saveGraphButton.setBounds(10, 100, 200, 30);
+        saveGraphButton.addActionListener(e -> saveGraphToFile());
+        add(saveGraphButton);
     	
 
         JLabel nodeNameLabel = new JLabel("Node Name:");
@@ -170,6 +156,40 @@ public class GraphPanel extends JPanel {
         });
     }
     
+    
+    private void saveGraphToFile() {
+        // Prompt user to choose a file location
+        JFileChooser fileChooser = new JFileChooser();
+        int option = fileChooser.showSaveDialog(this);
+        
+        if (option == JFileChooser.APPROVE_OPTION) {
+            // Get the selected file
+            File file = fileChooser.getSelectedFile();
+            try (PrintWriter writer = new PrintWriter(file)) {
+            	
+                // Write graph information to the file
+                writer.println(nodes.size()); // Number of nodes
+                for (Node node : nodes) {
+                    writer.println(node.getPoint().x + "," + node.getPoint().y + "," + node.getNodeName());
+                }
+                
+                writer.println(edges.size()); // Number of edges
+                for (Edge edge : edges) {
+                    writer.println(nodes.indexOf(edge.getStart()) + "," + nodes.indexOf(edge.getEnd()) + "," + edge.getWeight());
+                }
+                
+                writer.println(directed); // Whether the graph is directed
+                writer.println(weighted); // Whether the graph is weighted
+                writer.println(); // Add a blank line for readability
+                
+                JOptionPane.showMessageDialog(this, "The graph is saved successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                
+            } catch (IOException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Failed to save the graph.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
 
     private void addNode(Point point) {
         String nodeName = nodeNameTextField.getText();

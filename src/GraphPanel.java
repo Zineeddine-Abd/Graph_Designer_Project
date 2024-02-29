@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Line2D;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -20,7 +21,7 @@ import java.util.List;
 
 public class GraphPanel extends JPanel {
 
-    private enum Mode { ADD_NODE, ADD_EDGE }
+    private enum Mode { ADD_NODE, ADD_EDGE, REMOVE_NODE, REMOVE_EDGE }
     private Mode mode = Mode.ADD_NODE;
 
     private List<Node> nodes = new ArrayList<>();
@@ -28,6 +29,8 @@ public class GraphPanel extends JPanel {
 
     private Node selectedNode1 = null;
     private Node selectedNode2 = null;
+    private Edge selectedEdge = null;
+
 
     private boolean directed = false;
     private boolean weighted = false;
@@ -38,7 +41,11 @@ public class GraphPanel extends JPanel {
     private boolean weightEntered = false;
 
     private JButton addNodeButton;
+    private JButton removeNodeButton;
     private boolean addNodeClicked = false;
+    JButton addEdgeButton;
+    private JButton removeEdgeButton;
+    
     private JButton generateMatrixButton;
 
 
@@ -49,7 +56,7 @@ public class GraphPanel extends JPanel {
         setLayout(null);
 
         addNodeButton = new JButton("Add Node");
-        addNodeButton.setBounds(10, 20, 100, 30);
+        addNodeButton.setBounds(10, 20, 120, 30);
         addNodeButton.setEnabled(false);
         addNodeButton.addActionListener(e -> {
             mode = Mode.ADD_NODE;
@@ -57,13 +64,25 @@ public class GraphPanel extends JPanel {
             repaint();
         });
         add(addNodeButton);
+        
+        removeNodeButton = new JButton("Remove Node");
+        removeNodeButton.setBounds(10, 60, 120, 30);
+        removeNodeButton.addActionListener(e -> {
+            mode = Mode.REMOVE_NODE;
+            selectedNode1 = null;
+            selectedNode2 = null;
+            selectedEdge = null;
+            repaint();
+        });
+        add(removeNodeButton);
 
-        JButton addEdgeButton = new JButton("Add Edge");
-        addEdgeButton.setBounds(120, 20, 100, 30);
+        addEdgeButton = new JButton("Add Edge");
+        addEdgeButton.setBounds(140, 20, 120, 30);
         addEdgeButton.addActionListener(e -> {
             mode = Mode.ADD_EDGE;
             selectedNode1 = null;
             selectedNode2 = null;
+            selectedEdge = null;
 
             if (weighted) {
                 weightLabel.setVisible(true);
@@ -74,25 +93,36 @@ public class GraphPanel extends JPanel {
         });
         add(addEdgeButton);
         
+        removeEdgeButton = new JButton("Remove Edge"); // New button for removing edges
+        removeEdgeButton.setBounds(140, 60, 120, 30);
+        removeEdgeButton.addActionListener(e -> {
+            mode = Mode.REMOVE_EDGE;
+            selectedNode1 = null;
+            selectedNode2 = null;
+            selectedEdge = null;
+            repaint();
+        });
+        add(removeEdgeButton);
+        
         generateMatrixButton = new JButton("Generate Adjacency Matrix");
-        generateMatrixButton.setBounds(10, 60, 200, 30);
+        generateMatrixButton.setBounds(10, 110, 200, 30);
         generateMatrixButton.addActionListener(e -> {
             generateAndDisplayAdjacencyMatrix();
         });
         add(generateMatrixButton);
         
         JButton saveGraphButton = new JButton("Save Graph");
-        saveGraphButton.setBounds(10, 100, 200, 30);
+        saveGraphButton.setBounds(10, 150, 200, 30);
         saveGraphButton.addActionListener(e -> saveGraphToFile());
         add(saveGraphButton);
     	
 
         JLabel nodeNameLabel = new JLabel("Node Name:");
-        nodeNameLabel.setBounds(230, 20, 80, 30);
+        nodeNameLabel.setBounds(290, 20, 80, 30);
         add(nodeNameLabel);
 
         nodeNameTextField = new JTextField();
-        nodeNameTextField.setBounds(320, 20, 100, 30);
+        nodeNameTextField.setBounds(390, 20, 100, 30);
         nodeNameTextField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
             @Override
             public void insertUpdate(javax.swing.event.DocumentEvent e) {
@@ -113,12 +143,12 @@ public class GraphPanel extends JPanel {
 
         if (weighted) {
             weightLabel = new JLabel("Weight:");
-            weightLabel.setBounds(430, 20, 60, 30);
+            weightLabel.setBounds(520, 20, 60, 30);
             weightLabel.setVisible(false);
             add(weightLabel);
 
             weightTextField = new JTextField();
-            weightTextField.setBounds(500, 20, 50, 30);
+            weightTextField.setBounds(590, 20, 50, 30);
             weightTextField.setVisible(false);
             weightTextField.addActionListener(e -> {
                 weightEntered = true;
@@ -130,31 +160,37 @@ public class GraphPanel extends JPanel {
         
         
 
-     // Set the mouse listener to prevent drawing in the button area
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                if (e.getY() > 150) { // Allow drawing only in the area below y=150
-                    Point clickedPoint = e.getPoint();
-                    switch (mode) {
-                        case ADD_NODE:
-                            if (!nodeNameTextField.getText().isEmpty() && addNodeClicked == true) {
-                                addNode(clickedPoint);
-                            }
-                            break;
-                        case ADD_EDGE:
-                            if (weighted) {
-                                if (weightEntered) {
-                                    selectNodesForEdge(clickedPoint);
-                                }
-                            } else {
-                                selectNodesForEdge(clickedPoint);
-                            }
-                            break;
-                    }
+                Point clickedPoint = e.getPoint();
+                if(e.getY() > 190) {
+	                switch (mode) {
+	                    case ADD_NODE:
+	                        if (!nodeNameTextField.getText().isEmpty()) {
+	                            addNode(clickedPoint);
+	                        }
+	                        break;
+	                    case REMOVE_NODE:
+	                        removeNode(clickedPoint);
+	                        break;
+	                    case ADD_EDGE:
+	                        if (weighted) {
+	                            if (weightEntered) {
+	                                selectNodesForEdge(clickedPoint);
+	                            }
+	                        } else {
+	                            selectNodesForEdge(clickedPoint);
+	                        }
+	                        break;
+	                    case REMOVE_EDGE:
+	                        removeEdge(clickedPoint);
+	                        break;
+	                }
                 }
             }
+
         });
     }
     
@@ -200,6 +236,27 @@ public class GraphPanel extends JPanel {
         nodeNameTextField.setText("");
         checkNodeName();
         repaint();
+    }
+    
+    private void removeNode(Point point) {
+        for (Node node : nodes) {
+            if (node.contains(point)) {
+                nodes.remove(node);
+                removeIncidentEdges(node);
+                repaint();
+                return;
+            }
+        }
+    }
+
+    private void removeIncidentEdges(Node node) {
+        List<Edge> edgesToRemove = new ArrayList<>();
+        for (Edge edge : edges) {
+            if (edge.getStart().equals(node) || edge.getEnd().equals(node)) {
+                edgesToRemove.add(edge);
+            }
+        }
+        edges.removeAll(edgesToRemove);
     }
 
     private void selectNodesForEdge(Point point) {
@@ -250,6 +307,17 @@ public class GraphPanel extends JPanel {
             weightLabel.setVisible(false);
             weightTextField.setVisible(false);
             repaint();
+        }
+    }
+    
+    private void removeEdge(Point clickPoint) {
+        for (Edge edge : edges) {
+            if (edge.isPointNearLine(clickPoint)) {
+                selectedEdge = edge;
+                edges.remove(edge);
+                repaint();
+                break;
+            }
         }
     }
 
@@ -484,7 +552,18 @@ class Edge {
     int getWeight() {
     	return weight;
     }
-
+    
+    public boolean isPointNearLine(Point point) {
+        // Calculate the distance from the point to the line segment defined by the edge
+        double distance = Line2D.ptSegDist(start.getPoint().x, start.getPoint().y, end.getPoint().x, end.getPoint().y, point.x, point.y);
+        
+        // Define a threshold distance within which we consider the point to be "near" the line
+        double threshold = 5.0; // Adjust this threshold as needed
+        
+        // Return true if the distance is within the threshold
+        return distance <= threshold;
+    }
+    
     public void draw(Graphics g, boolean weighted, boolean directed) {
         
     	g.setColor(color);

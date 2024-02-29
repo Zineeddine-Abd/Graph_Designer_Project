@@ -35,7 +35,7 @@ public class GraphDesigner extends JFrame {
     //initialize the frame of the graph designer
     private void initialize(boolean directed, boolean weighted) {
         setTitle("Graph Designer");
-        setSize(600, 400);
+        setSize(700, 500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         graphPanel = new GraphPanel(directed, weighted);

@@ -130,29 +130,31 @@ public class GraphPanel extends JPanel {
         
         
 
+     // Set the mouse listener to prevent drawing in the button area
         addMouseListener(new MouseAdapter() {
-        	@Override
-        	public void mouseClicked(MouseEvent e) {
-        	    super.mouseClicked(e);
-        	    Point clickedPoint = e.getPoint();
-        	    switch (mode) {
-        	        case ADD_NODE:
-        	            if (!nodeNameTextField.getText().isEmpty() && addNodeClicked == true) {
-        	                addNode(clickedPoint);
-        	            }
-        	            break;
-        	        case ADD_EDGE:
-        	            if (weighted) {
-        	                if (weightEntered) {
-        	                    selectNodesForEdge(clickedPoint);
-        	                }
-        	            } else {
-        	                selectNodesForEdge(clickedPoint);
-        	            }
-        	            break;
-        	    }
-        	}
-
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                if (e.getY() > 150) { // Allow drawing only in the area below y=150
+                    Point clickedPoint = e.getPoint();
+                    switch (mode) {
+                        case ADD_NODE:
+                            if (!nodeNameTextField.getText().isEmpty() && addNodeClicked == true) {
+                                addNode(clickedPoint);
+                            }
+                            break;
+                        case ADD_EDGE:
+                            if (weighted) {
+                                if (weightEntered) {
+                                    selectNodesForEdge(clickedPoint);
+                                }
+                            } else {
+                                selectNodesForEdge(clickedPoint);
+                            }
+                            break;
+                    }
+                }
+            }
         });
     }
     

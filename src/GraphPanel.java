@@ -193,16 +193,20 @@ public class GraphPanel extends JPanel {
         
         
         addMouseMotionListener(new MouseAdapter() {
-            @Override
+        	@Override
             public void mouseDragged(MouseEvent e) {
                 super.mouseDragged(e);
                 if (selectedNode != null) {
                     Point currentMousePosition = e.getPoint();
                     int dx = currentMousePosition.x - lastMousePosition.x;
                     int dy = currentMousePosition.y - lastMousePosition.y;
-                    selectedNode.moveBy(dx, dy);
-                    lastMousePosition = currentMousePosition;
-                    repaint();
+
+                    // Check if the new position of the node violates the Y-coordinate limit
+                    if (selectedNode.getPoint().y + dy > 190) {
+                        selectedNode.moveBy(dx, dy);
+                        lastMousePosition = currentMousePosition;
+                        repaint();
+                    }
                 }
             }
         });

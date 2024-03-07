@@ -39,7 +39,11 @@ public class GraphDesigner extends JFrame {
     //initialize the frame of the graph designer
     private void initialize(boolean directed, boolean weighted) {
         setTitle("Graph Designer");
-        setSize(700, 500);
+        // Get the screen size
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        // Set the size of the frame to match the screen size
+        setSize(screenSize);
+        
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         graphPanel = new GraphPanel(directed, weighted);

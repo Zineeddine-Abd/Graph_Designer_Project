@@ -21,7 +21,7 @@ public class GraphConfigurationDialog extends JDialog {
     public GraphConfigurationDialog() {
     	
         setTitle("Graph Configuration");
-        setSize(300, 150);
+        setSize(400, 200);
         setModal(true);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
@@ -49,7 +49,7 @@ public class GraphConfigurationDialog extends JDialog {
         panel.add(loadGraphLabel);
 
         JButton loadGraphButton = new JButton("LOAD GRAPH");
-        loadGraphButton.addActionListener(new ActionListener() {
+        loadGraphButton.addActionListener(new ActionListener() { //Lamda expression
         	
         	@Override
             public void actionPerformed(ActionEvent e) {
@@ -62,8 +62,7 @@ public class GraphConfigurationDialog extends JDialog {
         panel.add(loadGraphButton);
 
         JButton saveButton = new JButton("Save");
-        //Lamda expression
-        saveButton.addActionListener(new ActionListener() {
+        saveButton.addActionListener(new ActionListener() { //Lamda expression
             
         	@Override
             public void actionPerformed(ActionEvent e) {
@@ -71,7 +70,7 @@ public class GraphConfigurationDialog extends JDialog {
                 directed = directedCheckBox.isSelected();
                 weighted = weightedCheckBox.isSelected();
                 useMatrix = matrixCheckBox.isSelected();
-                dispose();// close the container wich is the JDialog after hitting save
+                dispose();// close the container (wich is the JDialog) after hitting save
             }
         });
 
@@ -81,10 +80,14 @@ public class GraphConfigurationDialog extends JDialog {
     
     
     private void loadGraphFromFile() {
+    	
         JFileChooser fileChooser = new JFileChooser();
         int option = fileChooser.showOpenDialog(this);
+        
         if (option == JFileChooser.APPROVE_OPTION) {
+        	
             File file = fileChooser.getSelectedFile();
+            
             try (Scanner scanner = new Scanner(file)) {
                 // Read graph information from the file
                 int numNodes = Integer.parseInt(scanner.nextLine());
@@ -96,6 +99,7 @@ public class GraphConfigurationDialog extends JDialog {
                     String nodeName = nodeInfo[2];
                     loadedNodes.add(new Node(new Point(x, y), nodeName));
                 }
+                
                 int numEdges = Integer.parseInt(scanner.nextLine());
                 List<Edge> loadedEdges = new ArrayList<>();
                 for (int i = 0; i < numEdges; i++) {

@@ -12,29 +12,34 @@ import java.util.List;
 
 
 public class GraphPanel extends JPanel {
-
+	
+	//Program modes
     private enum Mode { ADD_NODE, ADD_EDGE, REMOVE_NODE, REMOVE_EDGE }
     private Mode mode = Mode.ADD_NODE;
-
+    
+    //Graph infos
     private List<Node> nodes = new ArrayList<>();
     private List<Edge> edges = new ArrayList<>();
-
+    private boolean directed = false;
+    private boolean weighted = false;
+    
+    //For adding and deleting nodes and edges
     private Node selectedNode1 = null;
     private Node selectedNode2 = null;
     private Edge selectedEdge = null;
-
-
-    private boolean directed = false;
-    private boolean weighted = false;
+    
+    private Node selectedNode = null; // Track the selected node for dragging
+    private Point lastMousePosition = null; // Track the last mouse position for dragging
 
     private JLabel weightLabel;
-    private JTextField weightTextField;
-    private JTextField nodeNameTextField;
     private boolean weightEntered = false;
-
+    private JTextField weightTextField;
+ 
     private JButton addNodeButton;
     private JButton removeNodeButton;
+    private JTextField nodeNameTextField;
     private boolean addNodeClicked = false;
+    
     JButton addEdgeButton;
     private JButton removeEdgeButton;
     
@@ -42,6 +47,7 @@ public class GraphPanel extends JPanel {
 
 
     public GraphPanel(boolean directed, boolean weighted) {
+    	
         this.directed = directed;
         this.weighted = weighted;
 
@@ -184,6 +190,44 @@ public class GraphPanel extends JPanel {
             }
 
         });
+        
+        
+        addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                super.mouseDragged(e);
+                if (selectedNode != null) {
+                    Point currentMousePosition = e.getPoint();
+                    int dx = currentMousePosition.x - lastMousePosition.x;
+                    int dy = currentMousePosition.y - lastMousePosition.y;
+                    selectedNode.moveBy(dx, dy);
+                    lastMousePosition = currentMousePosition;
+                    repaint();
+                }
+            }
+        });
+
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                super.mousePressed(e);
+                Point clickedPoint = e.getPoint();
+                for (Node node : nodes) {
+                    if (node.contains(clickedPoint)) {
+                        selectedNode = node;
+                        lastMousePosition = clickedPoint;
+                        break;
+                    }
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                super.mouseReleased(e);
+                selectedNode = null;
+            }
+        });
+ 
     }
     
     
@@ -314,11 +358,19 @@ public class GraphPanel extends JPanel {
     }
 
     private void checkNodeName() {
-        if (nodeNameTextField.getText().isEmpty()) {
-            addNodeButton.setEnabled(false);
-        } else {
-            addNodeButton.setEnabled(true);
+    	String nodeName = nodeNameTextField.getText();
+        boolean nameTaken = false;
+        
+        // Check if the entered node name is already taken by another node
+        for (Node node : nodes) {
+            if (node.getNodeName().equals(nodeName)) {
+                nameTaken = true;
+                break;
+            }
         }
+        
+        // Enable/disable the "Add Node" button based on whether the name is taken
+        addNodeButton.setEnabled(!nodeName.isEmpty() && !nameTaken);
     }
     
  // Method to create graph from adjacency matrix with distributed nodes and node names and edge weights
@@ -497,6 +549,10 @@ class Node {
     public boolean contains(Point p) {
         int tolerance = 10; // Adjust tolerance as needed
         return (Math.abs(point.x - p.x) <= tolerance && Math.abs(point.y - p.y) <= tolerance);
+    }
+    
+    public void moveBy(int dx, int dy) {
+        point.translate(dx, dy);
     }
 
     public void draw(Graphics g) {

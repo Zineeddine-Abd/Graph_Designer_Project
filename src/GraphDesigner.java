@@ -15,12 +15,15 @@ import java.util.HashMap;
 import java.util.List;
 
 public class GraphDesigner extends JFrame {
-
+	
+	//---------------------------------------------------------------------------------------------------------------------------------
+	//for simple initialization
     public GraphDesigner(boolean directed, boolean weighted) {
         initialize(directed, weighted);
     }
 
-    
+    //---------------------------------------------------------------------------------------------------------------------------------
+    //for matrix initialization
     public GraphDesigner(boolean directed, boolean weighted, int[][] adjacencyMatrix, String[] nodeNames, String[] edgeWeights) {
         initialize(directed, weighted);
         graphPanel.createGraphFromAdjacencyMatrix(adjacencyMatrix, nodeNames, edgeWeights);
@@ -31,6 +34,7 @@ public class GraphDesigner extends JFrame {
         initialize(directed, weighted);
         graphPanel.createGraphFromAdjacencyMatrix(adjacencyMatrix, nodeNames); // Create graph from adjacency matrix
     }
+    //---------------------------------------------------------------------------------------------------------------------------------
 
     //initialize the frame of the graph designer
     private void initialize(boolean directed, boolean weighted) {

@@ -8,22 +8,24 @@ public class Main {
 
     public static void main(String[] args) {
     	
-        // Create and display the configuration dialog
-        SwingUtilities.invokeLater(() -> {
+        
+        SwingUtilities.invokeLater(() -> { //(for he safety)
+        	
+        	// Create and display the configuration dialog
             GraphConfigurationDialog dialog = new GraphConfigurationDialog();
             centerFrame(dialog); // Center the dialog
             dialog.setVisible(true);
 
             boolean directed = dialog.isDirected();
             boolean weighted = dialog.isWeighted();
-            boolean useMatrix = dialog.isUseMatrix(); // New method to check if user wants to use adjacency matrix
+            boolean useMatrix = dialog.isUseMatrix();
             dialog.dispose(); // Dispose the dialog after retrieving configuration
 
             if (useMatrix) {
                 // Show dialog to input adjacency matrix and node names
                 JTextField dimensionField = new JTextField(5);
                 JTextField matrixField = new JTextField(20);
-                JTextField nodeNameField = new JTextField(20); // Text field for node names
+                JTextField nodeNameField = new JTextField(20);
                 JTextField weightField = null;
 
                 JPanel matrixPanel = new JPanel();
@@ -44,8 +46,8 @@ public class Main {
                     matrixPanel.add(weightField); // Text field for edge weights
                 }
 
-                int result = JOptionPane.showConfirmDialog(null, matrixPanel,
-                        "Enter Adjacency Matrix and Node Names", JOptionPane.OK_CANCEL_OPTION);
+                int result = JOptionPane.showConfirmDialog(null, matrixPanel,"Enter Adjacency Matrix and Node Names", JOptionPane.OK_CANCEL_OPTION);
+                
                 if (result == JOptionPane.OK_OPTION) {
                     try {
                         int dimension = Integer.parseInt(dimensionField.getText());

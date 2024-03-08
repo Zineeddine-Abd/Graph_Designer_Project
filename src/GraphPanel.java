@@ -247,15 +247,18 @@ public class GraphPanel extends JPanel {
                 super.mouseDragged(e);
                 if (selectedNode != null) {
                     Point currentMousePosition = e.getPoint();
-                    int dx = currentMousePosition.x - lastMousePosition.x;
-                    int dy = currentMousePosition.y - lastMousePosition.y;
-                    	
+                    // Check if the dragging point is within the bounds of the right panel
+                    if (rightPanel.contains(currentMousePosition)) {
+                        int dx = currentMousePosition.x - lastMousePosition.x;
+                        int dy = currentMousePosition.y - lastMousePosition.y;
                         selectedNode.moveBy(dx, dy);
                         lastMousePosition = currentMousePosition;
                         rightPanel.repaint();
+                    }
                 }
             }
         });
+
 
         rightPanel.addMouseListener(new MouseAdapter() {
             @Override

@@ -1,13 +1,17 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Line2D;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 
 
@@ -110,6 +114,18 @@ public class GraphPanel extends JPanel {
             repaint();
         });
         leftPanel.add(removeEdgeButton);
+        
+        
+        JButton loadGraphButton = new JButton("Load Graph");
+        loadGraphButton.setBounds(10, 570, 350, 50);
+        loadGraphButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                loadGraphFromFile();
+            }
+        });
+        leftPanel.add(loadGraphButton);
+    
 
         generateMatrixButton = new JButton("Generate Adjacency Matrix");
         generateMatrixButton.setBounds(10, 640, 350, 50);
@@ -220,7 +236,8 @@ public class GraphPanel extends JPanel {
                         case REMOVE_EDGE:
                             removeEdge(clickedPoint);
                             break;
-                    }
+                    
+                }
             }
         });
 
@@ -232,7 +249,7 @@ public class GraphPanel extends JPanel {
                     Point currentMousePosition = e.getPoint();
                     int dx = currentMousePosition.x - lastMousePosition.x;
                     int dy = currentMousePosition.y - lastMousePosition.y;
-                
+                    	
                         selectedNode.moveBy(dx, dy);
                         lastMousePosition = currentMousePosition;
                         rightPanel.repaint();
@@ -296,6 +313,65 @@ public class GraphPanel extends JPanel {
             }
         }
     }
+    
+    
+    private void loadGraphFromFile() {
+        // Open file chooser dialog to select the file
+        JFileChooser fileChooser = new JFileChooser();
+        int result = fileChooser.showOpenDialog(this);
+
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            try {
+                Scanner scanner = new Scanner(selectedFile);
+                
+                getNodes().clear();
+                getEdges().clear();
+                
+                // Read the number of nodes
+                int numNodes = Integer.parseInt(scanner.nextLine());
+                
+                // Read node coordinates and names
+                for (int i = 0; i < numNodes; i++) {
+                    String[] nodeData = scanner.nextLine().split(",");
+                    int x = Integer.parseInt(nodeData[0]);
+                    int y = Integer.parseInt(nodeData[1]);
+                    String nodeName = nodeData[2];
+                    // Create node and add to graph panel
+                    Node newNode = new Node(new Point(x, y), nodeName);
+                    getNodes().add(newNode);
+                }
+                
+                // Read the number of edges
+                int numEdges = Integer.parseInt(scanner.nextLine());
+                
+                // Read edge data
+                for (int i = 0; i < numEdges; i++) {
+                    String[] edgeData = scanner.nextLine().split(",");
+                    int startIndex = Integer.parseInt(edgeData[0]);
+                    int endIndex = Integer.parseInt(edgeData[1]);
+                    int weight = Integer.parseInt(edgeData[2]);
+                    // Create edge and add to graph panel
+                    Edge newEdge = new Edge(getNodes().get(startIndex), getNodes().get(endIndex), weight);
+                    getEdges().add(newEdge);
+                }
+                
+                 setDirected(Boolean.parseBoolean(scanner.nextLine()));
+                 setWeighted(Boolean.parseBoolean(scanner.nextLine()));
+                
+                // Repaint the graph panel to reflect the changes
+                repaint();
+                
+                // Close the scanner
+                scanner.close();
+                
+            } catch (FileNotFoundException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Failed to load graph from file", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
 
     private void addNode(Point point) {
         String nodeName = nodeNameTextField.getText();

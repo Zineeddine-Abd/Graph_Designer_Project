@@ -130,7 +130,7 @@ public class GraphPanel extends JPanel {
         loadGraphButton.setFont(loadButtonFont);
         loadGraphButton.setBorder(new LineBorder(Color.BLUE));
         
-        loadGraphButton.setBounds(10, 570, 350, 50);
+        loadGraphButton.setBounds(10, 550, 350, 50);
         loadGraphButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -145,7 +145,7 @@ public class GraphPanel extends JPanel {
         generateMatrixButton.setFont(matrixButtonFont);
         generateMatrixButton.setBorder(new LineBorder(Color.BLUE));
         
-        generateMatrixButton.setBounds(10, 640, 350, 50);
+        generateMatrixButton.setBounds(10, 620, 350, 50);
         generateMatrixButton.addActionListener(e -> {
             generateAndDisplayAdjacencyMatrix();
         });
@@ -154,9 +154,11 @@ public class GraphPanel extends JPanel {
         JButton saveGraphButton = new JButton("Save Graph");
         Font saveButtonFont = new Font("Arial", Font.BOLD, 15);
         saveGraphButton.setFont(saveButtonFont);
-        saveGraphButton.setBorder(new LineBorder(Color.BLUE));
+        saveGraphButton.setBackground(Color.BLUE);
+        saveGraphButton.setForeground(Color.WHITE);
+        saveGraphButton.setBorder(new LineBorder(Color.BLACK));
         
-        saveGraphButton.setBounds(10, 710, 350, 50);
+        saveGraphButton.setBounds(10, 720, 350, 50);
         saveGraphButton.addActionListener(e -> saveGraphToFile());
         leftPanel.add(saveGraphButton);
 
@@ -228,7 +230,7 @@ public class GraphPanel extends JPanel {
             }
         };
         
-        rightPanel.setBackground(new Color(0,255,255,90));
+        rightPanel.setBackground(new Color(255,255,255));
         rightPanel.setLayout(new BorderLayout());
         add(rightPanel, BorderLayout.CENTER);
 
@@ -661,8 +663,8 @@ public class GraphPanel extends JPanel {
 class Node {
     private Point point;
     private String nodeName;
-    private final Color color = Color.RED;
-    private final int size = 30;
+    private final Color color = Color.BLUE;
+    private final int size = 35;
 
     public Node(Point point, String nodeName) {
         this.point = point;
@@ -697,7 +699,7 @@ class Node {
         g.setColor(color);
         g.fillOval(point.x - nodeSize / 2, point.y - nodeSize / 2, nodeSize, nodeSize);
         if (nodeName != null) {
-            g.setColor(Color.BLACK);
+            g.setColor(Color.WHITE);
             g.drawString(nodeName, point.x - nodeName.length() * 3, point.y + 5);
         }
     }

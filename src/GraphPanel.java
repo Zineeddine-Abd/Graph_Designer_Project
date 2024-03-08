@@ -1,4 +1,7 @@
 import javax.swing.*;
+import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -61,12 +64,15 @@ public class GraphPanel extends JPanel {
         JPanel leftPanel = new JPanel();
         
         leftPanel.setLayout(null);
-        leftPanel.setBackground(Color.LIGHT_GRAY);;
+        leftPanel.setBackground(Color.LIGHT_GRAY);
+        leftPanel.setBorder(new LineBorder(Color.BLACK));
+        
         leftPanel.setPreferredSize(new Dimension(370, getHeight()));
         add(leftPanel, BorderLayout.WEST);
 
         // Add buttons and input fields to the left panel
         addNodeButton = new JButton("Add Node");
+        addNodeButton.setBorder(new LineBorder(Color.BLACK));
         addNodeButton.setBounds(10, 20, 120, 30);
         addNodeButton.setEnabled(false);
         addNodeButton.addActionListener(e -> {
@@ -77,6 +83,7 @@ public class GraphPanel extends JPanel {
         leftPanel.add(addNodeButton);
 
         removeNodeButton = new JButton("Remove Node");
+        removeNodeButton.setBorder(new LineBorder(Color.BLACK));
         removeNodeButton.setBounds(10, 60, 120, 30);
         removeNodeButton.addActionListener(e -> {
             mode = Mode.REMOVE_NODE;
@@ -88,6 +95,7 @@ public class GraphPanel extends JPanel {
         leftPanel.add(removeNodeButton);
 
         addEdgeButton = new JButton("Add Edge");
+        addEdgeButton.setBorder(new LineBorder(Color.BLACK));
         addEdgeButton.setBounds(10, 120, 120, 30);
         addEdgeButton.addActionListener(e -> {
             mode = Mode.ADD_EDGE;
@@ -105,6 +113,7 @@ public class GraphPanel extends JPanel {
         leftPanel.add(addEdgeButton);
 
         removeEdgeButton = new JButton("Remove Edge");
+        removeEdgeButton.setBorder(new LineBorder(Color.BLACK));
         removeEdgeButton.setBounds(10, 160, 120, 30);
         removeEdgeButton.addActionListener(e -> {
             mode = Mode.REMOVE_EDGE;
@@ -117,6 +126,10 @@ public class GraphPanel extends JPanel {
         
         
         JButton loadGraphButton = new JButton("Load Graph");
+        Font loadButtonFont = new Font("Arial", Font.BOLD, 15);
+        loadGraphButton.setFont(loadButtonFont);
+        loadGraphButton.setBorder(new LineBorder(Color.BLUE));
+        
         loadGraphButton.setBounds(10, 570, 350, 50);
         loadGraphButton.addActionListener(new ActionListener() {
             @Override
@@ -128,6 +141,10 @@ public class GraphPanel extends JPanel {
     
 
         generateMatrixButton = new JButton("Generate Adjacency Matrix");
+        Font matrixButtonFont = new Font("Arial", Font.BOLD, 15);
+        generateMatrixButton.setFont(matrixButtonFont);
+        generateMatrixButton.setBorder(new LineBorder(Color.BLUE));
+        
         generateMatrixButton.setBounds(10, 640, 350, 50);
         generateMatrixButton.addActionListener(e -> {
             generateAndDisplayAdjacencyMatrix();
@@ -135,6 +152,10 @@ public class GraphPanel extends JPanel {
         leftPanel.add(generateMatrixButton);
 
         JButton saveGraphButton = new JButton("Save Graph");
+        Font saveButtonFont = new Font("Arial", Font.BOLD, 15);
+        saveGraphButton.setFont(saveButtonFont);
+        saveGraphButton.setBorder(new LineBorder(Color.BLUE));
+        
         saveGraphButton.setBounds(10, 710, 350, 50);
         saveGraphButton.addActionListener(e -> saveGraphToFile());
         leftPanel.add(saveGraphButton);

@@ -207,6 +207,7 @@ public class GraphPanel extends JPanel {
             }
         };
         
+        rightPanel.setBackground(new Color(0,255,255,90));
         rightPanel.setLayout(new BorderLayout());
         add(rightPanel, BorderLayout.CENTER);
 
@@ -588,27 +589,27 @@ public class GraphPanel extends JPanel {
     }
 
 
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-
-        for (Edge edge : edges) {
-            edge.draw(g, weighted, directed);
-        }
-
-        for (Node node : nodes) {
-            node.draw(g);
-        }
-
-        if (selectedNode1 != null) {
-            g.setColor(Color.RED);
-            g.fillOval(selectedNode1.getPoint().x - 5, selectedNode1.getPoint().y - 5, 10, 10);
-        }
-        if (selectedNode2 != null) {
-            g.setColor(Color.RED);
-            g.fillOval(selectedNode2.getPoint().x - 5, selectedNode2.getPoint().y - 5, 10, 10);
-        }
-    }
+//    @Override
+//    protected void paintComponent(Graphics g) {
+//        super.paintComponent(g);
+//
+//        for (Edge edge : edges) {
+//            edge.draw(g, weighted, directed);
+//        }
+//
+//        for (Node node : nodes) {
+//            node.draw(g);
+//        }
+//
+//        if (selectedNode1 != null) {
+//            g.setColor(Color.RED);
+//            g.fillOval(selectedNode1.getPoint().x - 5, selectedNode1.getPoint().y - 5, 10, 10);
+//        }
+//        if (selectedNode2 != null) {
+//            g.setColor(Color.RED);
+//            g.fillOval(selectedNode2.getPoint().x - 5, selectedNode2.getPoint().y - 5, 10, 10);
+//        }
+//    }
 
 
     public List<Node> getNodes() {

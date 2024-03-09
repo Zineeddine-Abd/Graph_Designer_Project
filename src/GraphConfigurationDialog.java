@@ -23,7 +23,7 @@ public class GraphConfigurationDialog extends JDialog {
         setTitle("Graph Configuration");
         setSize(400, 200);
         setModal(true);
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
         JPanel panel = new JPanel(new GridLayout(4, 2));
 
@@ -49,7 +49,7 @@ public class GraphConfigurationDialog extends JDialog {
         panel.add(loadGraphLabel);
 
         JButton loadGraphButton = new JButton("LOAD GRAPH");
-        loadGraphButton.addActionListener(new ActionListener() { //Lamda expression
+        loadGraphButton.addActionListener(new ActionListener() {
         	
         	@Override
             public void actionPerformed(ActionEvent e) {
@@ -62,7 +62,7 @@ public class GraphConfigurationDialog extends JDialog {
         panel.add(loadGraphButton);
 
         JButton saveButton = new JButton("Save");
-        saveButton.addActionListener(new ActionListener() { //Lamda expression
+        saveButton.addActionListener(new ActionListener() {
             
         	@Override
             public void actionPerformed(ActionEvent e) {
@@ -70,7 +70,7 @@ public class GraphConfigurationDialog extends JDialog {
                 directed = directedCheckBox.isSelected();
                 weighted = weightedCheckBox.isSelected();
                 useMatrix = matrixCheckBox.isSelected();
-                dispose();// close the container (wich is the JDialog) after hitting save
+                dispose();// close the container that contains the button (wich is the JDialog) after hitting save
             }
         });
 
@@ -82,13 +82,14 @@ public class GraphConfigurationDialog extends JDialog {
     private void loadGraphFromFile() {
     	
         JFileChooser fileChooser = new JFileChooser();
-        int option = fileChooser.showOpenDialog(this);
+        int option = fileChooser.showOpenDialog(this); //thi = parent component (JDialog) for centering the Filechooser
         
-        if (option == JFileChooser.APPROVE_OPTION) {
+        if (option == JFileChooser.APPROVE_OPTION) { // file has been selected
         	
             File file = fileChooser.getSelectedFile();
             
             try (Scanner scanner = new Scanner(file)) {
+            	
                 // Read graph information from the file
                 int numNodes = Integer.parseInt(scanner.nextLine());
                 List<Node> loadedNodes = new ArrayList<>();

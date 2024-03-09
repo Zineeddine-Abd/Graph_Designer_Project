@@ -16,28 +16,35 @@ import java.util.List;
 
 public class GraphDesigner extends JFrame {
 	
+	private GraphPanel graphPanel;
+	
+	
 	//---------------------------------------------------------------------------------------------------------------------------------
 	//for simple initialization
+	
     public GraphDesigner(boolean directed, boolean weighted) {
         initialize(directed, weighted);
     }
 
     //---------------------------------------------------------------------------------------------------------------------------------
     //for matrix initialization
+    
+    //Weighted
     public GraphDesigner(boolean directed, boolean weighted, int[][] adjacencyMatrix, String[] nodeNames, String[] edgeWeights) {
         initialize(directed, weighted);
         graphPanel.createGraphFromAdjacencyMatrix(adjacencyMatrix, nodeNames, edgeWeights);
     }
     
-    
+    //UnWeighted
     public GraphDesigner(boolean directed, boolean weighted, int[][] adjacencyMatrix, String[] nodeNames) {
         initialize(directed, weighted);
-        graphPanel.createGraphFromAdjacencyMatrix(adjacencyMatrix, nodeNames); // Create graph from adjacency matrix
+        graphPanel.createGraphFromAdjacencyMatrix(adjacencyMatrix, nodeNames);
     }
     //---------------------------------------------------------------------------------------------------------------------------------
 
     //initialize the frame of the graph designer
     private void initialize(boolean directed, boolean weighted) {
+    	
         setTitle("Graph Designer");
         // Get the screen size
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -52,7 +59,7 @@ public class GraphDesigner extends JFrame {
         setVisible(true); // Make the frame visible before calling createGraphFromAdjacencyMatrix
     }
 
-    private GraphPanel graphPanel;
+    
     
     public GraphPanel getGraphPanel() {
         return graphPanel;

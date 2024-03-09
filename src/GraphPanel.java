@@ -23,8 +23,11 @@ public class GraphPanel extends JPanel {
 	// Program modes
     private enum Mode { ADD_NODE, ADD_EDGE, REMOVE_NODE, REMOVE_EDGE }
     private Mode mode = Mode.ADD_NODE;
-
-    // Graph infos
+    
+    JPanel rightPanel = new JPanel();
+    JPanel leftPanel = new JPanel();
+    
+    // Graph Infos
     private List<Node> nodes = new ArrayList<>();
     private List<Edge> edges = new ArrayList<>();
     private boolean directed = false;
@@ -40,8 +43,8 @@ public class GraphPanel extends JPanel {
     private Point lastMousePosition = null; 
 
     private JLabel weightLabel;
-    private boolean weightEntered = false;
     private JTextField weightTextField;
+    private boolean weightEntered = false;
 
     private JButton addNodeButton;
     private JButton removeNodeButton;
@@ -69,14 +72,24 @@ public class GraphPanel extends JPanel {
         
         leftPanel.setPreferredSize(new Dimension(370, getHeight()));
         add(leftPanel, BorderLayout.WEST);
+        
+        JLabel titleLabel = new JLabel("GRAPH CONFIGURATIONS");
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        titleLabel.setBounds(1, 1, 368, 50);
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER); // Center align the text
+        titleLabel.setForeground(Color.	WHITE);
+        titleLabel.setBackground(Color.GRAY); // Set the background color to yellow
+        titleLabel.setOpaque(true); // Make sure to setOpaque(true) to make the background color visible
+        titleLabel.setBorder(new LineBorder(Color.BLUE));
+        leftPanel.add(titleLabel);
 
         // Add buttons and input fields to the left panel
         addNodeButton = new JButton("Add Node");
         addNodeButton.setBorder(new LineBorder(Color.BLACK));
-        addNodeButton.setBounds(10, 20, 120, 30);
+        addNodeButton.setBounds(10, 70, 120, 30);
         addNodeButton.setEnabled(false);
-        addNodeButton.addActionListener(e -> {
-            mode = Mode.ADD_NODE;
+        addNodeButton.addActionListener(e -> { // The e parameter represents the ActionEvent object
+            mode = Mode.ADD_NODE;			   //that is passed to the actionPerformed method when the button is clicked
             addNodeClicked = true;
             repaint();
         });
@@ -84,7 +97,7 @@ public class GraphPanel extends JPanel {
 
         removeNodeButton = new JButton("Remove Node");
         removeNodeButton.setBorder(new LineBorder(Color.BLACK));
-        removeNodeButton.setBounds(10, 60, 120, 30);
+        removeNodeButton.setBounds(10, 110, 120, 30);
         removeNodeButton.addActionListener(e -> {
             mode = Mode.REMOVE_NODE;
             selectedNode1 = null;
@@ -93,10 +106,10 @@ public class GraphPanel extends JPanel {
             repaint();
         });
         leftPanel.add(removeNodeButton);
-
+        
         addEdgeButton = new JButton("Add Edge");
         addEdgeButton.setBorder(new LineBorder(Color.BLACK));
-        addEdgeButton.setBounds(10, 120, 120, 30);
+        addEdgeButton.setBounds(10, 170, 120, 30);
         addEdgeButton.addActionListener(e -> {
             mode = Mode.ADD_EDGE;
             selectedNode1 = null;
@@ -106,15 +119,15 @@ public class GraphPanel extends JPanel {
             if (weighted) {
                 weightLabel.setVisible(true);
                 weightTextField.setVisible(true);
-                weightTextField.requestFocus();
-            }
+                weightTextField.requestFocus(); // the component that has focus typically displays a highlighted border or some other visual indicator
+            }                                   // to indicate that it's the currently active component.
             repaint();
         });
         leftPanel.add(addEdgeButton);
 
         removeEdgeButton = new JButton("Remove Edge");
         removeEdgeButton.setBorder(new LineBorder(Color.BLACK));
-        removeEdgeButton.setBounds(10, 160, 120, 30);
+        removeEdgeButton.setBounds(10, 210, 120, 30);
         removeEdgeButton.addActionListener(e -> {
             mode = Mode.REMOVE_EDGE;
             selectedNode1 = null;
@@ -163,12 +176,12 @@ public class GraphPanel extends JPanel {
         leftPanel.add(saveGraphButton);
 
         JLabel nodeNameLabel = new JLabel("Node Name:");
-        nodeNameLabel.setBounds(150, 20, 80, 30);
+        nodeNameLabel.setBounds(150, 70, 80, 30);
         leftPanel.add(nodeNameLabel);
 
         nodeNameTextField = new JTextField();
-        nodeNameTextField.setBounds(240, 20, 120, 30);
-        nodeNameTextField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+        nodeNameTextField.setBounds(240, 70, 120, 30);
+        nodeNameTextField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() { //anonymous inner class
             @Override
             public void insertUpdate(javax.swing.event.DocumentEvent e) {
                 checkNodeName();
@@ -188,12 +201,12 @@ public class GraphPanel extends JPanel {
 
         if (weighted) {
             weightLabel = new JLabel("Edge Weight:");
-            weightLabel.setBounds(150, 120, 80, 30);
+            weightLabel.setBounds(150, 170, 80, 30);
             weightLabel.setVisible(false);
             leftPanel.add(weightLabel);
 
             weightTextField = new JTextField();
-            weightTextField.setBounds(240, 120, 50, 30);
+            weightTextField.setBounds(240, 170, 50, 30);
             weightTextField.setVisible(false);
             weightTextField.addActionListener(e -> {
                 weightEntered = true;
@@ -214,14 +227,7 @@ public class GraphPanel extends JPanel {
                 for (Node node : nodes) {
                     node.draw(g);
                 }
-                if (selectedNode1 != null) {
-                    g.setColor(Color.RED);
-                    g.fillOval(selectedNode1.getPoint().x - 5, selectedNode1.getPoint().y - 5, 10, 10);
-                }
-                if (selectedNode2 != null) {
-                    g.setColor(Color.RED);
-                    g.fillOval(selectedNode2.getPoint().x - 5, selectedNode2.getPoint().y - 5, 10, 10);
-                }
+                
             }
 
             @Override
@@ -231,12 +237,13 @@ public class GraphPanel extends JPanel {
         };
         
         rightPanel.setBackground(new Color(255,255,255));
+        rightPanel.setBorder(new LineBorder(Color.BLACK));
         rightPanel.setLayout(new BorderLayout());
         add(rightPanel, BorderLayout.CENTER);
 
-        rightPanel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
+        rightPanel.addMouseListener(new MouseAdapter() { //MouseAdapter class in Java is an abstract adapter class that implements the MouseListener interface.
+            @Override                                    //It provides default implementations for all the methods in the MouseListener interface
+            public void mouseClicked(MouseEvent e) {	 //so i can implement just the methods i want to implement
                 super.mouseClicked(e);
                 Point clickedPoint = e.getPoint();
                     switch (mode) {
@@ -287,7 +294,7 @@ public class GraphPanel extends JPanel {
         rightPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                super.mousePressed(e);
+                super.mousePressed(e);// its empty method , but for no errors
                 Point clickedPoint = e.getPoint();
                 for (Node node : nodes) {
                     if (node.contains(clickedPoint)) {
@@ -308,6 +315,7 @@ public class GraphPanel extends JPanel {
     
     
     private void saveGraphToFile() {
+    	
         // Prompt user to choose a file location
         JFileChooser fileChooser = new JFileChooser();
         int option = fileChooser.showSaveDialog(this);
@@ -328,9 +336,9 @@ public class GraphPanel extends JPanel {
                     writer.println(nodes.indexOf(edge.getStart()) + "," + nodes.indexOf(edge.getEnd()) + "," + edge.getWeight());
                 }
                 
-                writer.println(directed); // Whether the graph is directed
-                writer.println(weighted); // Whether the graph is weighted
-                writer.println(); // Add a blank line for readability
+                writer.println(directed); 
+                writer.println(weighted); 
+                writer.println(); 
                 
                 JOptionPane.showMessageDialog(this, "The graph is saved successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
                 
@@ -383,11 +391,18 @@ public class GraphPanel extends JPanel {
                     getEdges().add(newEdge);
                 }
                 
-                 setDirected(Boolean.parseBoolean(scanner.nextLine()));
-                 setWeighted(Boolean.parseBoolean(scanner.nextLine()));
+                Boolean Directed = Boolean.parseBoolean(scanner.nextLine());
+                Boolean Weighted = Boolean.parseBoolean(scanner.nextLine());
                 
-                // Repaint the graph panel to reflect the changes
-                repaint();
+                // Create a new GraphDesigner with loaded graph information
+                GraphDesigner graphDesigner = new GraphDesigner(Directed, Weighted);
+                graphDesigner.getGraphPanel().getNodes().addAll(nodes);
+                graphDesigner.getGraphPanel().getEdges().addAll(edges);
+                graphDesigner.getGraphPanel().repaint();
+                graphDesigner.setVisible(true);
+                // Close the current frame
+                SwingUtilities.getWindowAncestor(this).dispose();
+                
                 
                 // Close the scanner
                 scanner.close();
@@ -431,6 +446,7 @@ public class GraphPanel extends JPanel {
     }
 
     private void selectNodesForEdge(Point point) {
+    	
         for (Node node : nodes) {
             if (node.contains(point)) {
                 if (selectedNode1 == null) {
@@ -450,6 +466,7 @@ public class GraphPanel extends JPanel {
                         weightLabel.setVisible(false);
                         weightTextField.setVisible(false);
                         weightEntered = false;
+                        
                     } else {
                         edges.add(new Edge(selectedNode1, selectedNode2));
                     }
@@ -612,29 +629,6 @@ public class GraphPanel extends JPanel {
     }
 
 
-//    @Override
-//    protected void paintComponent(Graphics g) {
-//        super.paintComponent(g);
-//
-//        for (Edge edge : edges) {
-//            edge.draw(g, weighted, directed);
-//        }
-//
-//        for (Node node : nodes) {
-//            node.draw(g);
-//        }
-//
-//        if (selectedNode1 != null) {
-//            g.setColor(Color.RED);
-//            g.fillOval(selectedNode1.getPoint().x - 5, selectedNode1.getPoint().y - 5, 10, 10);
-//        }
-//        if (selectedNode2 != null) {
-//            g.setColor(Color.RED);
-//            g.fillOval(selectedNode2.getPoint().x - 5, selectedNode2.getPoint().y - 5, 10, 10);
-//        }
-//    }
-
-
     public List<Node> getNodes() {
         return nodes;
     }
@@ -777,7 +771,7 @@ class Edge {
             int x = midX - squareSize / 2;
             int y = midY - squareSize / 2;
             
-            g.setColor(Color.WHITE);
+            g.setColor(Color.YELLOW);
             g.drawRect(x, y, squareSize, squareSize);
             g.fillRect(x, y, squareSize, squareSize);
             

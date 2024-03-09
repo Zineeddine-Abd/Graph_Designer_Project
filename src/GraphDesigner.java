@@ -51,6 +51,11 @@ public class GraphDesigner extends JFrame {
         // Set the size of the frame to match the screen size
         setSize(screenSize);
         
+        // Load the icon
+        ImageIcon icon = new ImageIcon("Graph_Icon.png");
+        setIconImage(icon.getImage());
+        
+        
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         graphPanel = new GraphPanel(directed, weighted);

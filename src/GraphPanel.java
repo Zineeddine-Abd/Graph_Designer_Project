@@ -690,6 +690,18 @@ class Node {
         Font font = new Font("Arial", Font.BOLD, 13);
         g.setFont(font);
         
+        // Set the thickness of the border
+        Graphics2D g2d = (Graphics2D) g;
+        Stroke originalStroke = g2d.getStroke();
+        g2d.setStroke(new BasicStroke(2)); // Adjust the thickness as needed
+
+        // Draw node border
+        g.setColor(Color.BLACK);
+        g.drawOval(point.x - nodeSize / 2, point.y - nodeSize / 2, nodeSize, nodeSize);
+
+        // Restore the original stroke
+        g2d.setStroke(originalStroke);
+        
         g.setColor(color);
         g.fillOval(point.x - nodeSize / 2, point.y - nodeSize / 2, nodeSize, nodeSize);
         if (nodeName != null) {

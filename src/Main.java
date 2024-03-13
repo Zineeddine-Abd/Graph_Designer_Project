@@ -11,6 +11,15 @@ public class Main {
         
         SwingUtilities.invokeLater(() -> { //(for he safety)
         	
+//        	try {
+//				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+//					| UnsupportedLookAndFeelException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+        	
+        	
         	// Create and display the structure configuration dialog
             StructureConfigurationDialog structureDialog = new StructureConfigurationDialog();
             centerFrame(structureDialog); // Center the dialog

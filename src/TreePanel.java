@@ -1,8 +1,7 @@
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 
@@ -29,6 +28,14 @@ public class TreePanel extends JPanel {
     private int nodeBorderThickness = 2;
     private int edgeThickness = 2;
 
+    // Variables for dragging nodes
+    private boolean isDragging = false;
+    private int dragOffsetX;
+    private int dragOffsetY;
+    private TreeNode draggedNode;
+    
+    // Radius of the node
+    private int nodeRadius = 20;
 
     public TreePanel() {
         nodesMap = new HashMap<>();
@@ -93,6 +100,53 @@ public class TreePanel extends JPanel {
         // Set background color and border for the panel
         setBackground(Color.LIGHT_GRAY);
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
+
+        // Add mouse listeners for dragging nodes
+        addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                int mouseX = e.getX();
+                int mouseY = e.getY();
+                draggedNode = findNodeAtPosition(mouseX, mouseY);
+                if (draggedNode != null) {
+                    isDragging = true;
+                    dragOffsetX = mouseX - draggedNode.x;
+                    dragOffsetY = mouseY - draggedNode.y;
+                }
+            }
+
+            public void mouseReleased(MouseEvent e) {
+                isDragging = false;
+                if (draggedNode != null) {
+                    draggedNode = null;
+                    repaint();
+                }
+            }
+        });
+
+        addMouseMotionListener(new MouseMotionAdapter() {
+            public void mouseDragged(MouseEvent e) {
+                if (isDragging && draggedNode != null) {
+                    int x = e.getX() - dragOffsetX;
+                    int y = draggedNode.y;
+                    draggedNode.x = x;
+                    draggedNode.y = y;
+                    repaint();
+                }
+            }
+        });
+    }
+
+    private TreeNode findNodeAtPosition(int x, int y) {
+        for (TreeNode node : nodesMap.values()) {
+            int nodeX = node.x - nodeRadius;
+            int nodeY = node.y - nodeRadius;
+            int width = 2 * nodeRadius;
+            int height = 2 * nodeRadius;
+            if (x >= nodeX && x <= nodeX + width && y >= nodeY && y <= nodeY + height) {
+                return node;
+            }
+        }
+        return null;
     }
 
     private void addRootNode() {
@@ -120,6 +174,8 @@ public class TreePanel extends JPanel {
                 JOptionPane.showMessageDialog(this, "Root node already exists.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
+            newNode.x = getWidth() / 2;
+            newNode.y = 90;
             nodesMap.put(nodeName, newNode);
         } else {
             TreeNode parentNode = nodesMap.get(parentNodeName);
@@ -127,11 +183,19 @@ public class TreePanel extends JPanel {
                 JOptionPane.showMessageDialog(this, "Parent node does not exist.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
+
+            // Calculate x-coordinate for new node based on the parent node's position
+            int numChildren = parentNode.children.size();
+            int siblingWidth = 100; // Adjust as needed
+            int totalWidth = siblingWidth * (numChildren + 1);
+            newNode.x = parentNode.x - totalWidth / 2 + (numChildren + 1) * siblingWidth;
+            newNode.y = parentNode.y + 100; // Adjust y-coordinate for new node
             parentNode.addChild(newNode);
             nodesMap.put(nodeName, newNode);
         }
         repaint();
     }
+    
 
     public void removeNode(String nodeName) {
         TreeNode nodeToRemove = nodesMap.get(nodeName);
@@ -189,30 +253,26 @@ public class TreePanel extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         if (!nodesMap.isEmpty()) {
-            int rootX = getWidth() / 2;
-            int rootY = 90;
-            int levelHeight = 80;
-            int siblingWidth = 100;
-            int nodeRadius = 20;
-
-            drawTree(g, nodesMap.values().iterator().next(), rootX, rootY, levelHeight, siblingWidth, nodeRadius);
+            for (TreeNode node : nodesMap.values()) {
+                drawTree(g, node);
+            }
         }
     }
 
-    private void drawTree(Graphics g, TreeNode node, int x, int y, int levelHeight, int siblingWidth, int nodeRadius) {
+    private void drawTree(Graphics g, TreeNode node) {
         Graphics2D g2d = (Graphics2D) g;
-
+        
         // Store the default stroke
         Stroke defaultStroke = g2d.getStroke();
         
-        // Set border thickness for nodes and edges
+        // Set border thickness for nodes
         g2d.setStroke(new BasicStroke(nodeBorderThickness));
         
         // Draw current node
         g.setColor(Color.BLACK);
-        g.drawOval(x - nodeRadius, y - nodeRadius, 2 * nodeRadius, 2 * nodeRadius);
+        g.drawOval(node.x - nodeRadius, node.y - nodeRadius, 2 * nodeRadius, 2 * nodeRadius);
         g.setColor(Color.BLUE);
-        g.fillOval(x - nodeRadius, y - nodeRadius, 2 * nodeRadius, 2 * nodeRadius);
+        g.fillOval(node.x - nodeRadius, node.y - nodeRadius, 2 * nodeRadius, 2 * nodeRadius);
 
         // Adjust font size based on node radius
         Font boldFont = nodeFont.deriveFont(Font.BOLD, nodeNameFontSize);
@@ -220,39 +280,28 @@ public class TreePanel extends JPanel {
         FontMetrics fm = g.getFontMetrics(boldFont);
         int nameWidth = fm.stringWidth(node.name);
         int nameHeight = fm.getHeight();
-        int nameX = x - nameWidth / 2;
-        int nameY = y + nameHeight / 4;
+        int nameX = node.x - nameWidth / 2;
+        int nameY = node.y + nameHeight / 4;
 
         g.setColor(textColor);
         g.setFont(boldFont);
         g.drawString(node.name, nameX, nameY);
-        // Draw children recursively
-        java.util.List<TreeNode> children = node.children;
-        int numChildren = children.size();
-        int totalWidth = (numChildren - 1) * siblingWidth;
-        int startX = x - totalWidth / 2;
-
-        // Set edge thickness
-        g2d.setStroke(new BasicStroke(edgeThickness));
-
-        for (int i = 0; i < numChildren; i++) {
-            TreeNode child = children.get(i);
-            int childX = startX + i * siblingWidth;
-            int childY = y + levelHeight;
-            g.setColor(Color.BLACK);
-            g.drawLine(x, y + nodeRadius, childX, childY - nodeRadius);
-            drawTree(g, child, childX, childY, levelHeight, siblingWidth, nodeRadius);
-        }
         
-        // reSet thickness
+        // Revert to default stroke
         g2d.setStroke(defaultStroke);
+        
+        // Draw edges
+        for (TreeNode child : node.children) {
+            g.setColor(Color.BLACK);
+            g.drawLine(node.x, node.y, child.x, child.y);
+            drawTree(g, child); // Recursively draw children
+        }
     }
-
-
-
 
     private static class TreeNode implements Serializable {
         String name;
+        int x;
+        int y;
         java.util.List<TreeNode> children;
 
         TreeNode(String name) {

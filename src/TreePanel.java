@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,10 +14,21 @@ public class TreePanel extends JPanel {
     private JButton addButton;
     private JButton removeButton;
     private JButton addRootButton;
-    private JButton saveButton; // Button to save the tree structure
-    private JButton loadButton; // Button to load a saved tree structure
+    private JButton saveButton;
+    private JButton loadButton;
     private JTextField nodeNameField;
     private JTextField parentNodeField;
+
+    // Node colors
+    private Color nodeColor = Color.BLUE;
+    private Color textColor = Color.WHITE; // Change text color to black
+    private Font nodeFont = new Font("Arial", Font.PLAIN, 14);
+    private int nodeNameFontSize = 14;
+    
+    // Adjustable border thickness
+    private int nodeBorderThickness = 2;
+    private int edgeThickness = 2;
+
 
     public TreePanel() {
         nodesMap = new HashMap<>();
@@ -77,6 +89,10 @@ public class TreePanel extends JPanel {
         setLayout(new BorderLayout());
         add(inputPanel, BorderLayout.NORTH);
         add(buttonPanel, BorderLayout.SOUTH);
+
+        // Set background color and border for the panel
+        setBackground(Color.LIGHT_GRAY);
+        setBorder(BorderFactory.createLineBorder(Color.BLACK));
     }
 
     private void addRootNode() {
@@ -174,7 +190,7 @@ public class TreePanel extends JPanel {
         super.paintComponent(g);
         if (!nodesMap.isEmpty()) {
             int rootX = getWidth() / 2;
-            int rootY = 50;
+            int rootY = 90;
             int levelHeight = 80;
             int siblingWidth = 100;
             int nodeRadius = 20;
@@ -184,23 +200,56 @@ public class TreePanel extends JPanel {
     }
 
     private void drawTree(Graphics g, TreeNode node, int x, int y, int levelHeight, int siblingWidth, int nodeRadius) {
+        Graphics2D g2d = (Graphics2D) g;
+
+        // Store the default stroke
+        Stroke defaultStroke = g2d.getStroke();
+        
+        // Set border thickness for nodes and edges
+        g2d.setStroke(new BasicStroke(nodeBorderThickness));
+        
+        // Draw current node
         g.setColor(Color.BLACK);
         g.drawOval(x - nodeRadius, y - nodeRadius, 2 * nodeRadius, 2 * nodeRadius);
-        g.drawString(node.name, x - 5, y + 5);
+        g.setColor(Color.BLUE);
+        g.fillOval(x - nodeRadius, y - nodeRadius, 2 * nodeRadius, 2 * nodeRadius);
 
+        // Adjust font size based on node radius
+        Font boldFont = nodeFont.deriveFont(Font.BOLD, nodeNameFontSize);
+        
+        FontMetrics fm = g.getFontMetrics(boldFont);
+        int nameWidth = fm.stringWidth(node.name);
+        int nameHeight = fm.getHeight();
+        int nameX = x - nameWidth / 2;
+        int nameY = y + nameHeight / 4;
+
+        g.setColor(textColor);
+        g.setFont(boldFont);
+        g.drawString(node.name, nameX, nameY);
+        // Draw children recursively
         java.util.List<TreeNode> children = node.children;
         int numChildren = children.size();
         int totalWidth = (numChildren - 1) * siblingWidth;
         int startX = x - totalWidth / 2;
 
+        // Set edge thickness
+        g2d.setStroke(new BasicStroke(edgeThickness));
+
         for (int i = 0; i < numChildren; i++) {
             TreeNode child = children.get(i);
             int childX = startX + i * siblingWidth;
             int childY = y + levelHeight;
+            g.setColor(Color.BLACK);
             g.drawLine(x, y + nodeRadius, childX, childY - nodeRadius);
             drawTree(g, child, childX, childY, levelHeight, siblingWidth, nodeRadius);
         }
+        
+        // reSet thickness
+        g2d.setStroke(defaultStroke);
     }
+
+
+
 
     private static class TreeNode implements Serializable {
         String name;

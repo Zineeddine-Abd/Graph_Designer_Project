@@ -110,8 +110,12 @@ public class Main {
 			            }
 		            }
 		            else {
-		            	// Display message dialog when "Tree Structure" is selected
-		            	JOptionPane.showMessageDialog(null, "This feature is not available yet", "NOTICE", JOptionPane.INFORMATION_MESSAGE);
+		            	// Display TreeDesigner frame when Tree structure is selected
+		                SwingUtilities.invokeLater(() -> {
+		                    TreeDesigner treeDesigner = new TreeDesigner();
+		                    centerFrame(treeDesigner); // Center the main frame
+		                    treeDesigner.setVisible(true);
+		                });
 		            }
 	            }
 	            

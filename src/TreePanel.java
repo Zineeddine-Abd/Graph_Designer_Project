@@ -203,12 +203,23 @@ public class TreePanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Node does not exist.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        TreeNode parentNode = findParentNode(nodeToRemove);
-        if (parentNode != null) {
-            parentNode.removeChild(nodeToRemove);
-        }
-        nodesMap.remove(nodeName);
+        // Remove the node and its children recursively
+        removeNodeAndChildren(nodeToRemove);
         repaint();
+    }
+
+    private void removeNodeAndChildren(TreeNode node) {
+        // Recursively remove children
+        for (TreeNode child : new ArrayList<>(node.children)) {
+            removeNodeAndChildren(child);
+        }
+        // Remove the node from its parent's children list
+        TreeNode parentNode = findParentNode(node);
+        if (parentNode != null) {
+            parentNode.removeChild(node);
+        }
+        // Remove the node from the nodesMap
+        nodesMap.remove(node.name);
     }
 
     private TreeNode findParentNode(TreeNode node) {

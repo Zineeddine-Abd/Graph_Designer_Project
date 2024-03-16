@@ -186,17 +186,28 @@ public class TreePanel extends JPanel {
             }
         });
 
-        rightPanel.addMouseMotionListener(new MouseMotionAdapter() {
-            public void mouseDragged(MouseEvent e) {
-                if (isDragging && draggedNode != null) {
-                    int x = e.getX() - dragOffsetX;
-                    int y = draggedNode.y;
-                    draggedNode.x = x;
-                    draggedNode.y = y;
-                    repaint();
-                }
-            }
-        });
+       rightPanel.addMouseMotionListener(new MouseMotionAdapter() {
+    	    public void mouseDragged(MouseEvent e) {
+    	        if (isDragging && draggedNode != null) {
+    	            // Calculate the new position of the dragged node
+    	            int x = e.getX() - dragOffsetX;
+    	            int y = draggedNode.y;
+
+    	            // Ensure the node stays within the bounds of the panel
+    	            if (x < nodeRadius) {
+    	                x = nodeRadius;
+    	            } else if (x > rightPanel.getWidth() - nodeRadius) {
+    	                x = rightPanel.getWidth() - nodeRadius;
+    	            }
+
+    	            // Update the node's position
+    	            draggedNode.x = x;
+    	            draggedNode.y = y;
+    	            repaint();
+    	        }
+    	    }
+    	});
+
         
         
         add(rightPanel,BorderLayout.CENTER);

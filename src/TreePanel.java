@@ -38,6 +38,7 @@ public class TreePanel extends JPanel {
     private int nodeRadius = 20;
 
     public TreePanel() {
+    	
         nodesMap = new HashMap<>();
         addButton = new JButton("Add Node");
         removeButton = new JButton("Remove Node");
@@ -98,7 +99,8 @@ public class TreePanel extends JPanel {
         add(buttonPanel, BorderLayout.SOUTH);
 
         // Set background color and border for the panel
-        setBackground(Color.LIGHT_GRAY);
+        inputPanel.setBackground(Color.LIGHT_GRAY);
+        buttonPanel.setBackground(Color.LIGHT_GRAY);
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
         // Add mouse listeners for dragging nodes
@@ -272,13 +274,45 @@ public class TreePanel extends JPanel {
 
     private void drawTree(Graphics g, TreeNode node) {
         Graphics2D g2d = (Graphics2D) g;
-        
+
         // Store the default stroke
         Stroke defaultStroke = g2d.getStroke();
-        
+
+        // Set the desired thickness for the edges
+        float edgeThickness = 2.0f; // Adjust the thickness as needed
+
+        // Create a stroke with the desired thickness
+        Stroke edgeStroke = new BasicStroke(edgeThickness);
+
         // Set border thickness for nodes
-        g2d.setStroke(new BasicStroke(nodeBorderThickness));
-        
+        g2d.setStroke(edgeStroke);
+
+        // Draw edges
+        for (TreeNode child : node.children) {
+            // Calculate start and end points of the edge
+            int startX = node.x;
+            int startY = node.y;
+            int endX = child.x;
+            int endY = child.y;
+
+            // Calculate the angle between the two points
+            double angle = Math.atan2(endY - startY, endX - startX);
+
+            // Adjust start and end points to the borders of the nodes
+            startX += (int) (Math.cos(angle) * nodeRadius);
+            startY += (int) (Math.sin(angle) * nodeRadius);
+            endX -= (int) (Math.cos(angle) * nodeRadius);
+            endY -= (int) (Math.sin(angle) * nodeRadius);
+
+            // Draw the edge
+            g.setColor(Color.BLACK);
+            g.drawLine(startX, startY, endX, endY);
+
+            // Recursively draw children
+            drawTree(g, child);
+        }
+
+        // Draw current node after drawing edges to ensure it appears on top of edges
         // Draw current node
         g.setColor(Color.BLACK);
         g.drawOval(node.x - nodeRadius, node.y - nodeRadius, 2 * nodeRadius, 2 * nodeRadius);
@@ -287,7 +321,7 @@ public class TreePanel extends JPanel {
 
         // Adjust font size based on node radius
         Font boldFont = nodeFont.deriveFont(Font.BOLD, nodeNameFontSize);
-        
+
         FontMetrics fm = g.getFontMetrics(boldFont);
         int nameWidth = fm.stringWidth(node.name);
         int nameHeight = fm.getHeight();
@@ -297,17 +331,16 @@ public class TreePanel extends JPanel {
         g.setColor(textColor);
         g.setFont(boldFont);
         g.drawString(node.name, nameX, nameY);
-        
+
         // Revert to default stroke
         g2d.setStroke(defaultStroke);
-        
-        // Draw edges
+
+        // Recursively draw children nodes
         for (TreeNode child : node.children) {
-            g.setColor(Color.BLACK);
-            g.drawLine(node.x, node.y, child.x, child.y);
-            drawTree(g, child); // Recursively draw children
+            drawTree(g, child);
         }
     }
+
 
     private static class TreeNode implements Serializable {
         String name;

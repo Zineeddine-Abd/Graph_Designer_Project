@@ -11,7 +11,7 @@ public class TreeDesigner extends JFrame {
 
     private void initialize() {
         setTitle("Tree Designer");
-        setSize(800, 600);
+        setSize(1700, 900);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         treePanel = new TreePanel();

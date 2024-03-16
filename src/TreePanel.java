@@ -1,5 +1,7 @@
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -15,6 +17,8 @@ public class TreePanel extends JPanel {
     private JButton addRootButton;
     private JButton saveButton;
     private JButton loadButton;
+    private JLabel nodeName = new JLabel("Node Name : ");
+    private JLabel parentNodeName = new JLabel("Parent Node Name : ");
     private JTextField nodeNameField;
     private JTextField parentNodeField;
 
@@ -47,7 +51,36 @@ public class TreePanel extends JPanel {
         loadButton = new JButton("Load Tree");
         nodeNameField = new JTextField(10);
         parentNodeField = new JTextField(10);
-
+        setLayout(new BorderLayout());
+        
+        
+        //left Panel----------------------------------------------
+        JPanel leftPanel = new JPanel();
+        
+        leftPanel.setLayout(null);
+        leftPanel.setBackground(Color.LIGHT_GRAY);
+        leftPanel.setBorder(new LineBorder(Color.BLACK));
+        
+        leftPanel.setPreferredSize(new Dimension(370, getHeight()));
+        
+        JLabel titleLabel = new JLabel("TREE CONFIGURATIONS");
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        titleLabel.setBounds(1, 1, 368, 50);
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER); // Center align the text
+        titleLabel.setForeground(Color.	WHITE);
+        titleLabel.setBackground(Color.GRAY); // Set the background color to yellow
+        titleLabel.setOpaque(true); // Make sure to setOpaque(true) to make the background color visible
+        titleLabel.setBorder(new LineBorder(Color.BLUE));
+        leftPanel.add(titleLabel);
+        
+        nodeName.setBounds(10,70,120,20);
+        nodeNameField.setBounds(150,70,120, 20);
+        parentNodeName.setBounds(10,110,120,20);
+        parentNodeField.setBounds(150,110,120, 20);
+        
+        addButton = new JButton("Add Node");
+        addButton.setBorder(new LineBorder(Color.BLACK));
+        addButton.setBounds(20, 160, 150, 30);
         addButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String nodeName = nodeNameField.getText().trim();
@@ -55,56 +88,63 @@ public class TreePanel extends JPanel {
                 addNode(nodeName, parentNodeName);
             }
         });
-
+        
+        removeButton = new JButton("Remove Node");
+        removeButton.setBorder(new LineBorder(Color.BLACK));
+        removeButton.setBounds(200, 160, 150, 30);
         removeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String nodeName = nodeNameField.getText().trim();
                 removeNode(nodeName);
             }
         });
-
+        
+        addRootButton = new JButton("Add Root Node");
+        addRootButton.setBorder(new LineBorder(Color.BLACK));
+        addRootButton.setBounds(110, 200, 150, 30);
         addRootButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 addRootNode();
             }
         });
-
+        
+        saveButton = new JButton("Save Tree");
+        saveButton.setBorder(new LineBorder(Color.BLACK));
+        saveButton.setBounds(10, 720, 350, 50);
         saveButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 saveTree();
             }
         });
-
+        
+        loadButton = new JButton("Load Tree");
+        loadButton.setBorder(new LineBorder(Color.BLACK));
+        loadButton.setBounds(10, 650, 350, 50);
         loadButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 loadTree();
             }
         });
 
-        JPanel inputPanel = new JPanel();
-        inputPanel.add(new JLabel("Node Name:"));
-        inputPanel.add(nodeNameField);
-        inputPanel.add(new JLabel("Parent Node Name:"));
-        inputPanel.add(parentNodeField);
-        inputPanel.add(addButton);
-        inputPanel.add(removeButton);
+        leftPanel.add(addRootButton);
+        leftPanel.add(addButton);
+        leftPanel.add(removeButton);
+        leftPanel.add(nodeName);
+        leftPanel.add(nodeNameField);
+        leftPanel.add(parentNodeName);
+        leftPanel.add(parentNodeField);
+        leftPanel.add(saveButton);
+        leftPanel.add(loadButton);
 
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.add(addRootButton);
-        buttonPanel.add(saveButton);
-        buttonPanel.add(loadButton);
+        
+        add(leftPanel, BorderLayout.WEST);
 
-        setLayout(new BorderLayout());
-        add(inputPanel, BorderLayout.NORTH);
-        add(buttonPanel, BorderLayout.SOUTH);
-
-        // Set background color and border for the panel
-        inputPanel.setBackground(Color.LIGHT_GRAY);
-        buttonPanel.setBackground(Color.LIGHT_GRAY);
-        setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        //right Panel----------------------------------------------------
+        
+        JPanel rightPanel = new JPanel();
 
         // Add mouse listeners for dragging nodes
-        addMouseListener(new MouseAdapter() {
+       rightPanel. addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 int mouseX = e.getX();
                 int mouseY = e.getY();
@@ -125,7 +165,7 @@ public class TreePanel extends JPanel {
             }
         });
 
-        addMouseMotionListener(new MouseMotionAdapter() {
+        rightPanel.addMouseMotionListener(new MouseMotionAdapter() {
             public void mouseDragged(MouseEvent e) {
                 if (isDragging && draggedNode != null) {
                     int x = e.getX() - dragOffsetX;
@@ -136,6 +176,9 @@ public class TreePanel extends JPanel {
                 }
             }
         });
+        
+        
+        add(rightPanel,BorderLayout.CENTER);
     }
 
     private TreeNode findNodeAtPosition(int x, int y) {

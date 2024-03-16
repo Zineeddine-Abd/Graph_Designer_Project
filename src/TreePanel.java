@@ -40,6 +40,9 @@ public class TreePanel extends JPanel {
     
     // Radius of the node
     private int nodeRadius = 20;
+    
+    JPanel leftPanel;
+    JPanel rightPanel;
 
     public TreePanel() {
     	
@@ -55,7 +58,7 @@ public class TreePanel extends JPanel {
         
         
         //left Panel----------------------------------------------
-        JPanel leftPanel = new JPanel();
+        leftPanel = new JPanel();
         
         leftPanel.setLayout(null);
         leftPanel.setBackground(Color.LIGHT_GRAY);
@@ -141,7 +144,25 @@ public class TreePanel extends JPanel {
 
         //right Panel----------------------------------------------------
         
-        JPanel rightPanel = new JPanel();
+        rightPanel = new JPanel() {
+        	
+        	@Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                if (!nodesMap.isEmpty()) {
+                    for (TreeNode node : nodesMap.values()) {
+                        drawTree(g, node);
+                    }
+                }
+            }
+        	
+        };
+        
+        
+        // Set layout to null for manual positioning
+        rightPanel.setLayout(null);
+        // Set the preferred size of the right panel
+        rightPanel.setPreferredSize(new Dimension(400, 300));
 
         // Add mouse listeners for dragging nodes
        rightPanel. addMouseListener(new MouseAdapter() {
@@ -219,7 +240,7 @@ public class TreePanel extends JPanel {
                 JOptionPane.showMessageDialog(this, "Root node already exists.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            newNode.x = getWidth() / 2;
+            newNode.x = rightPanel.getWidth() / 2;
             newNode.y = 90;
             nodesMap.put(nodeName, newNode);
         } else {
@@ -305,15 +326,6 @@ public class TreePanel extends JPanel {
         }
     }
 
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        if (!nodesMap.isEmpty()) {
-            for (TreeNode node : nodesMap.values()) {
-                drawTree(g, node);
-            }
-        }
-    }
 
     private void drawTree(Graphics g, TreeNode node) {
         Graphics2D g2d = (Graphics2D) g;

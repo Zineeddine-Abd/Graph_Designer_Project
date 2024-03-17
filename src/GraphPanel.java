@@ -139,7 +139,7 @@ public class GraphPanel extends JPanel {
         
         
         JButton loadGraphButton = new JButton("Load Graph");
-        Font loadButtonFont = new Font("Arial", Font.BOLD, 15);
+        Font loadButtonFont = new Font("Arial", Font.BOLD, 20);
         loadGraphButton.setFont(loadButtonFont);
         loadGraphButton.setBorder(new LineBorder(Color.BLUE));
         
@@ -154,7 +154,7 @@ public class GraphPanel extends JPanel {
     
 
         generateMatrixButton = new JButton("Generate Adjacency Matrix");
-        Font matrixButtonFont = new Font("Arial", Font.BOLD, 15);
+        Font matrixButtonFont = new Font("Arial", Font.BOLD, 20);
         generateMatrixButton.setFont(matrixButtonFont);
         generateMatrixButton.setBorder(new LineBorder(Color.BLUE));
         
@@ -165,7 +165,7 @@ public class GraphPanel extends JPanel {
         leftPanel.add(generateMatrixButton);
 
         JButton saveGraphButton = new JButton("Save Graph");
-        Font saveButtonFont = new Font("Arial", Font.BOLD, 15);
+        Font saveButtonFont = new Font("Arial", Font.BOLD, 20);
         saveGraphButton.setFont(saveButtonFont);
         saveGraphButton.setBackground(Color.BLUE);
         saveGraphButton.setForeground(Color.WHITE);
@@ -216,7 +216,7 @@ public class GraphPanel extends JPanel {
         }
         
         // Add label for maximizing frame
-        JLabel maximizeLabel = new JLabel("<html><div style='text-align: center;'>Please maximize the window for better experience</div></html>");
+        JLabel maximizeLabel = new JLabel("<html><div style='text-align: center;'>You should maximize the window for better experience</div></html>");
         maximizeLabel.setFont(new Font("Arial", Font.BOLD, 20));
         maximizeLabel.setHorizontalAlignment(SwingConstants.CENTER);
         maximizeLabel.setBounds(10, 450, 350, 70);

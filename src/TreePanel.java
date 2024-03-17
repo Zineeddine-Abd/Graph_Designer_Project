@@ -113,7 +113,7 @@ public class TreePanel extends JPanel {
         });
 
         saveButton = new JButton("Save Tree");
-        Font saveButtonFont = new Font("Arial", Font.BOLD, 15);
+        Font saveButtonFont = new Font("Arial", Font.BOLD, 20);
         saveButton.setFont(saveButtonFont);
         saveButton.setBackground(Color.BLUE);
         saveButton.setForeground(Color.WHITE);
@@ -126,7 +126,7 @@ public class TreePanel extends JPanel {
         });
 
         loadButton = new JButton("Load Tree");
-        Font loadButtonFont = new Font("Arial", Font.BOLD, 15);
+        Font loadButtonFont = new Font("Arial", Font.BOLD,20 );
         loadButton.setFont(loadButtonFont);
         loadButton.setBorder(new LineBorder(Color.BLUE));
         loadButton.setBounds(10, 650, 350, 50);
@@ -137,7 +137,7 @@ public class TreePanel extends JPanel {
         });
         
         // Add label for maximizing frame
-        JLabel maximizeLabel = new JLabel("<html><div style='text-align: center;'>Please maximize the window for better experience</div></html>");
+        JLabel maximizeLabel = new JLabel("<html><div style='text-align: center;'>You should maximize the window for better experience</div></html>");
         maximizeLabel.setFont(new Font("Arial", Font.BOLD, 20));
         maximizeLabel.setHorizontalAlignment(SwingConstants.CENTER);
         maximizeLabel.setBounds(10, 550, 350, 70);

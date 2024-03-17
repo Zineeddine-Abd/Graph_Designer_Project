@@ -1,7 +1,5 @@
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -27,7 +25,7 @@ public class TreePanel extends JPanel {
     private Color textColor = Color.WHITE; // Change text color to black
     private Font nodeFont = new Font("Arial", Font.PLAIN, 14);
     private int nodeNameFontSize = 14;
-    
+
     // Adjustable border thickness
     private int nodeBorderThickness = 2;
     private int edgeThickness = 2;
@@ -37,50 +35,49 @@ public class TreePanel extends JPanel {
     private int dragOffsetX;
     private int dragOffsetY;
     private TreeNode draggedNode;
-    
+
     // Radius of the node
     private int nodeRadius = 20;
-    
+
     JPanel leftPanel;
     JPanel rightPanel;
 
     public TreePanel() {
-    	
+
         nodesMap = new HashMap<>();
         addButton = new JButton("Add Node");
         removeButton = new JButton("Remove Node");
         addRootButton = new JButton("Add Root Node");
         saveButton = new JButton("Save Tree");
         loadButton = new JButton("Load Tree");
-        nodeNameField = new JTextField(10);
-        parentNodeField = new JTextField(10);
+        nodeNameField = new JTextField(20);
+        parentNodeField = new JTextField(20);
         setLayout(new BorderLayout());
-        
-        
-        //left Panel----------------------------------------------
+
+        // left Panel----------------------------------------------
         leftPanel = new JPanel();
-        
+
         leftPanel.setLayout(null);
         leftPanel.setBackground(Color.LIGHT_GRAY);
         leftPanel.setBorder(new LineBorder(Color.BLACK));
-        
+
         leftPanel.setPreferredSize(new Dimension(370, getHeight()));
-        
+
         JLabel titleLabel = new JLabel("TREE CONFIGURATIONS");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
         titleLabel.setBounds(1, 1, 368, 50);
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER); // Center align the text
-        titleLabel.setForeground(Color.	WHITE);
+        titleLabel.setForeground(Color.WHITE);
         titleLabel.setBackground(Color.GRAY); // Set the background color to yellow
         titleLabel.setOpaque(true); // Make sure to setOpaque(true) to make the background color visible
         titleLabel.setBorder(new LineBorder(Color.BLUE));
         leftPanel.add(titleLabel);
-        
-        nodeName.setBounds(10,70,120,20);
-        nodeNameField.setBounds(150,70,120, 20);
-        parentNodeName.setBounds(10,110,120,20);
-        parentNodeField.setBounds(150,110,120, 20);
-        
+
+        nodeName.setBounds(20, 70, 120, 20);
+        nodeNameField.setBounds(200, 70, 150, 20);
+        parentNodeName.setBounds(20, 110, 120, 20);
+        parentNodeField.setBounds(200, 110, 150, 20);
+
         addButton = new JButton("Add Node");
         addButton.setBorder(new LineBorder(Color.BLACK));
         addButton.setBounds(20, 160, 150, 30);
@@ -91,7 +88,7 @@ public class TreePanel extends JPanel {
                 addNode(nodeName, parentNodeName);
             }
         });
-        
+
         removeButton = new JButton("Remove Node");
         removeButton.setBorder(new LineBorder(Color.BLACK));
         removeButton.setBounds(200, 160, 150, 30);
@@ -99,12 +96,12 @@ public class TreePanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 String nodeName = nodeNameField.getText().trim();
                 removeNode(nodeName);
-                if(nodesMap.isEmpty()) {
-                	addRootButton.setEnabled(true);
+                if (nodesMap.isEmpty()) {
+                    addRootButton.setEnabled(true);
                 }
             }
         });
-        
+
         addRootButton = new JButton("Add Root Node");
         addRootButton.setBorder(new LineBorder(Color.BLACK));
         addRootButton.setBounds(20, 210, 150, 30);
@@ -114,18 +111,20 @@ public class TreePanel extends JPanel {
                 addRootButton.setEnabled(false);
             }
         });
-        
+
         saveButton = new JButton("Save Tree");
         Font saveButtonFont = new Font("Arial", Font.BOLD, 15);
         saveButton.setFont(saveButtonFont);
-        saveButton.setBorder(new LineBorder(Color.BLUE));
+        saveButton.setBackground(Color.BLUE);
+        saveButton.setForeground(Color.WHITE);
+        saveButton.setBorder(new LineBorder(Color.BLACK));
         saveButton.setBounds(10, 720, 350, 50);
         saveButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 saveTree();
             }
         });
-        
+
         loadButton = new JButton("Load Tree");
         Font loadButtonFont = new Font("Arial", Font.BOLD, 15);
         loadButton.setFont(loadButtonFont);
@@ -147,14 +146,13 @@ public class TreePanel extends JPanel {
         leftPanel.add(saveButton);
         leftPanel.add(loadButton);
 
-        
         add(leftPanel, BorderLayout.WEST);
 
-        //right Panel----------------------------------------------------
-        
+        // right Panel----------------------------------------------------
+
         rightPanel = new JPanel() {
-        	
-        	@Override
+
+            @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 if (!nodesMap.isEmpty()) {
@@ -163,17 +161,32 @@ public class TreePanel extends JPanel {
                     }
                 }
             }
-        	
+
+            @Override
+            public Dimension getPreferredSize() {
+                int maxX = 0;
+                int maxY = 0;
+                for (TreeNode node : nodesMap.values()) {
+                    if (node.x > maxX) {
+                        maxX = node.x;
+                    }
+                    if (node.y > maxY) {
+                        maxY = node.y;
+                    }
+                }
+                // Adding some padding to maxX and maxY to ensure all nodes are visible
+                maxX += nodeRadius + 50; // Adjust padding as needed
+                maxY += nodeRadius + 50; // Adjust padding as needed
+                return new Dimension(maxX, maxY);
+            }
+
         };
-        
-        
+
         // Set layout to null for manual positioning
         rightPanel.setLayout(null);
-        // Set the preferred size of the right panel
-        rightPanel.setPreferredSize(new Dimension(400, 300));
 
         // Add mouse listeners for dragging nodes
-       rightPanel. addMouseListener(new MouseAdapter() {
+        rightPanel.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 int mouseX = e.getX();
                 int mouseY = e.getY();
@@ -194,31 +207,35 @@ public class TreePanel extends JPanel {
             }
         });
 
-       rightPanel.addMouseMotionListener(new MouseMotionAdapter() {
-    	    public void mouseDragged(MouseEvent e) {
-    	        if (isDragging && draggedNode != null) {
-    	            // Calculate the new position of the dragged node
-    	            int x = e.getX() - dragOffsetX;
-    	            int y = draggedNode.y;
+        rightPanel.addMouseMotionListener(new MouseMotionAdapter() {
+            public void mouseDragged(MouseEvent e) {
+                if (isDragging && draggedNode != null) {
+                    // Calculate the new position of the dragged node
+                    int x = e.getX() - dragOffsetX;
+                    int y = draggedNode.y;
 
-    	            // Ensure the node stays within the bounds of the panel
-    	            if (x < nodeRadius) {
-    	                x = nodeRadius;
-    	            } else if (x > rightPanel.getWidth() - nodeRadius) {
-    	                x = rightPanel.getWidth() - nodeRadius;
-    	            }
+                    // Ensure the node stays within the bounds of the panel
+                    if (x < nodeRadius) {
+                        x = nodeRadius;
+                    } else if (x > rightPanel.getWidth() - nodeRadius) {
+                        x = rightPanel.getWidth() - nodeRadius;
+                    }
 
-    	            // Update the node's position
-    	            draggedNode.x = x;
-    	            draggedNode.y = y;
-    	            repaint();
-    	        }
-    	    }
-    	});
+                    // Update the node's position
+                    draggedNode.x = x;
+                    draggedNode.y = y;
+                    repaint();
+                }
+            }
+        });
 
-        
-        
-        add(rightPanel,BorderLayout.CENTER);
+        // Create a JScrollPane and add rightPanel to it
+        JScrollPane scrollPane = new JScrollPane(rightPanel);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+        // Add the JScrollPane to the center of TreePanel
+        add(scrollPane, BorderLayout.CENTER);
     }
 
     private TreeNode findNodeAtPosition(int x, int y) {
@@ -278,9 +295,10 @@ public class TreePanel extends JPanel {
             parentNode.addChild(newNode);
             nodesMap.put(nodeName, newNode);
         }
+        revalidate(); // Update the preferred size
         repaint();
     }
-    
+
 
     public void removeNode(String nodeName) {
         TreeNode nodeToRemove = nodesMap.get(nodeName);
@@ -290,6 +308,7 @@ public class TreePanel extends JPanel {
         }
         // Remove the node and its children recursively
         removeNodeAndChildren(nodeToRemove);
+        revalidate(); // Update the preferred size
         repaint();
     }
 
@@ -337,6 +356,7 @@ public class TreePanel extends JPanel {
             File file = fileChooser.getSelectedFile();
             try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(file))) {
                 nodesMap = (Map<String, TreeNode>) inputStream.readObject();
+                revalidate(); // Update the preferred size
                 repaint();
             } catch (IOException | ClassNotFoundException e) {
                 JOptionPane.showMessageDialog(this, "Error loading tree: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -413,7 +433,6 @@ public class TreePanel extends JPanel {
             drawTree(g, child);
         }
     }
-
 
     private static class TreeNode implements Serializable {
         String name;

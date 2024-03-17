@@ -12,6 +12,7 @@ public class StructureConfigurationDialog extends JDialog {
     private JButton treeButton;
 
     private boolean isGraphSelected = false;
+    private boolean isTreeSelected = false;
 
     public StructureConfigurationDialog() {
     	
@@ -42,7 +43,7 @@ public class StructureConfigurationDialog extends JDialog {
         treeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                isGraphSelected = false;
+                isTreeSelected = true;
                 dispose();
             }
         });
@@ -55,5 +56,9 @@ public class StructureConfigurationDialog extends JDialog {
 
     public boolean isGraphSelected() {
         return isGraphSelected;
+    }
+    
+    public boolean isTreeSelected() {
+    	return isTreeSelected;
     }
 }

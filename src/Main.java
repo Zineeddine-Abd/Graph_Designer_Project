@@ -21,6 +21,7 @@ public class Main {
 	            @Override
 	            public void windowClosed(java.awt.event.WindowEvent windowEvent) {
 		            boolean isGraphSelected = structureDialog.isGraphSelected();
+		            boolean isTreeSelected = structureDialog.isTreeSelected();
 		            structureDialog.dispose(); // Dispose the dialog after retrieving configuration
 		        	
 		            if(isGraphSelected) {
@@ -110,12 +111,19 @@ public class Main {
 			            }
 		            }
 		            else {
-		            	// Display TreeDesigner frame when Tree structure is selected
-		                SwingUtilities.invokeLater(() -> {
-		                    TreeDesigner treeDesigner = new TreeDesigner();
-		                    centerFrame(treeDesigner); // Center the main frame
-		                    treeDesigner.setVisible(true);
-		                });
+		            	if(isTreeSelected) {
+		            		// Display TreeDesigner frame when Tree structure is selected
+			                SwingUtilities.invokeLater(() -> {
+			                    TreeDesigner treeDesigner = new TreeDesigner();
+			                    centerFrame(treeDesigner); // Center the main frame
+			                    treeDesigner.setVisible(true);
+			                });
+		            	}
+		            	else {
+		            		
+		            		//Nothing
+		            	}
+		            	
 		            }
 	            }
 	            

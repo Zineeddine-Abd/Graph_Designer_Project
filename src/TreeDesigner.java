@@ -12,6 +12,7 @@ public class TreeDesigner extends JFrame {
     private void initialize() {
         setTitle("Tree Designer");
         setSize(1700, 900);
+
         
         // Load the icon
         ImageIcon icon = new ImageIcon("Tree_Icon.png");

@@ -47,9 +47,9 @@ public class GraphDesigner extends JFrame {
     	
         setTitle("Graph Designer");
         // Get the screen size
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        //Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         // Set the size of the frame to match the screen size
-        setSize(screenSize);
+        setSize(1700, 900);
         
         // Load the icon
         ImageIcon icon = new ImageIcon("Graph_Icon.png");

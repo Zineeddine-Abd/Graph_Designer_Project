@@ -53,8 +53,7 @@ public class GraphConfigurationDialog extends JDialog {
         	
         	@Override
             public void actionPerformed(ActionEvent e) {
-        		
-        		loaded = true;
+  
                 loadGraphFromFile();
             }
         	
@@ -86,6 +85,7 @@ public class GraphConfigurationDialog extends JDialog {
         
         if (option == JFileChooser.APPROVE_OPTION) { // file has been selected
         	
+        	loaded = true;
             File file = fileChooser.getSelectedFile();
             
             try (Scanner scanner = new Scanner(file)) {

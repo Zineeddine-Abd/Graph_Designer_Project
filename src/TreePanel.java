@@ -135,7 +135,26 @@ public class TreePanel extends JPanel {
                 loadTree();
             }
         });
-
+        
+        // Add label for maximizing frame
+        JLabel maximizeLabel = new JLabel("<html><div style='text-align: center;'>Please maximize the window for better experience</div></html>");
+        maximizeLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        maximizeLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        maximizeLabel.setBounds(10, 550, 350, 70);
+        // Set foreground color (text color) to red
+        maximizeLabel.setForeground(Color.RED);
+        // Set border to black
+        maximizeLabel.setBorder(BorderFactory.createLineBorder(Color.RED));
+        
+        // Add label for designer information
+        JLabel designerLabel = new JLabel("Designed by Zine eddine ABDELADIM");
+        designerLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        designerLabel.setBounds(10, 750, 350, 70);
+        designerLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        designerLabel.setVerticalAlignment(SwingConstants.CENTER);
+        
+        leftPanel.add(designerLabel);
+        leftPanel.add(maximizeLabel);
         leftPanel.add(addRootButton);
         leftPanel.add(addButton);
         leftPanel.add(removeButton);
@@ -231,6 +250,7 @@ public class TreePanel extends JPanel {
 
         // Create a JScrollPane and add rightPanel to it
         JScrollPane scrollPane = new JScrollPane(rightPanel);
+        scrollPane.setBorder(new LineBorder(Color.BLACK));
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 

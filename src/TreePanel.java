@@ -99,20 +99,26 @@ public class TreePanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 String nodeName = nodeNameField.getText().trim();
                 removeNode(nodeName);
+                if(nodesMap.isEmpty()) {
+                	addRootButton.setEnabled(true);
+                }
             }
         });
         
         addRootButton = new JButton("Add Root Node");
         addRootButton.setBorder(new LineBorder(Color.BLACK));
-        addRootButton.setBounds(110, 200, 150, 30);
+        addRootButton.setBounds(20, 210, 150, 30);
         addRootButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 addRootNode();
+                addRootButton.setEnabled(false);
             }
         });
         
         saveButton = new JButton("Save Tree");
-        saveButton.setBorder(new LineBorder(Color.BLACK));
+        Font saveButtonFont = new Font("Arial", Font.BOLD, 15);
+        saveButton.setFont(saveButtonFont);
+        saveButton.setBorder(new LineBorder(Color.BLUE));
         saveButton.setBounds(10, 720, 350, 50);
         saveButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -121,7 +127,9 @@ public class TreePanel extends JPanel {
         });
         
         loadButton = new JButton("Load Tree");
-        loadButton.setBorder(new LineBorder(Color.BLACK));
+        Font loadButtonFont = new Font("Arial", Font.BOLD, 15);
+        loadButton.setFont(loadButtonFont);
+        loadButton.setBorder(new LineBorder(Color.BLUE));
         loadButton.setBounds(10, 650, 350, 50);
         loadButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -330,7 +338,6 @@ public class TreePanel extends JPanel {
             try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(file))) {
                 nodesMap = (Map<String, TreeNode>) inputStream.readObject();
                 repaint();
-                JOptionPane.showMessageDialog(this, "Tree loaded successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
             } catch (IOException | ClassNotFoundException e) {
                 JOptionPane.showMessageDialog(this, "Error loading tree: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }

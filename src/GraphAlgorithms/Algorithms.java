@@ -2,6 +2,7 @@ package GraphAlgorithms;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,8 +11,6 @@ import java.util.Set;
 import java.util.Stack;
 
 import GraphDesigner.*;
-import MainPackage.*;
-import TreeDesigner.*;
 
 //Graph Algorithms--------------------------------------------------------
 
@@ -108,6 +107,101 @@ public class Algorithms{
 	    }
 	    return flows;
 	}
+	
+	public static boolean isSemiEulerian(List<Node> nodes) {
+        int oddDegreeCount = 0;
+        for (Node node : nodes) {
+            if (node.getEdges().size() % 2 != 0) {
+                oddDegreeCount++;
+            }
+        }
+        return oddDegreeCount == 2;
+    }
+
+    public static List<Node> hierholzerEulerianPath(List<Node> nodes) {
+        List<Node> circuit = new ArrayList<>();
+        Stack<Node> stack = new Stack<>();
+        if (nodes.isEmpty())
+            return circuit;
+
+        Node start = nodes.get(0); // Start from the first node
+        stack.push(start);
+        while (!stack.isEmpty()) {
+            Node current = stack.peek();
+            if (!current.getEdges().isEmpty()) {
+                Edge edge = current.getEdges().remove(0); // Get the first edge
+                stack.push(edge.getEnd()); // Move to the next node
+            } else {
+                circuit.add(stack.pop());
+            }
+        }
+
+        Collections.reverse(circuit); // Reverse the circuit
+        return circuit;
+    }
+
+    public static List<Node> fleuryEulerianPath(List<Node> nodes) {
+        List<Node> path = new ArrayList<>();
+        if (nodes.isEmpty())
+            return path;
+
+        // Find a node with an odd degree (if any)
+        Node start = null;
+        for (Node node : nodes) {
+            if (node.getEdges().size() % 2 != 0) {
+                start = node;
+                break;
+            }
+        }
+        if (start == null) // If all nodes have even degree, start from any node
+            start = nodes.get(0);
+
+        eulerianPath(start, path);
+        return path;
+    }
+
+    private static void eulerianPath(Node node, List<Node> path) {
+    	Set<Edge> visitedEdges = new HashSet<>();
+    	for (Edge edge : node.getEdges()) {
+            if (!visitedEdges.contains(edge) && !createsBridge(edge)) {
+                visitedEdges.add(edge);
+                eulerianPath(edge.getEnd(), path);
+            }
+        }
+        path.add(node);
+    }
+
+    private static boolean createsBridge(Edge edge) {
+    	Set<Edge> visitedEdges = new HashSet<>();
+    	int count = 0;
+        for (Edge e : edge.getEnd().getEdges()) {
+            if (!visitedEdges.contains(e))
+                count++;
+        }
+        return count == 1; // If removing this edge creates a bridge
+    }
+
+    public static List<Node> dfsEulerianPath(List<Node> nodes) {
+    	List<Node> path = new ArrayList<>();
+        if (nodes.isEmpty())
+            return path;
+
+        Node start = nodes.get(0); // Start from the first node
+        dfs(start, path);
+        return path;
+    }
+
+    private static void dfs(Node node, List<Node> path) {
+    	Set<Edge> visitedEdges = new HashSet<>();
+    	while (!node.getEdges().isEmpty()) {
+            Edge edge = node.getEdges().remove(0); // Get the first edge
+            if (!visitedEdges.contains(edge)) {
+                visitedEdges.add(edge);
+                dfs(edge.getEnd(), path);
+            }
+        }
+        path.add(node);
+    }
 	
 	// Depth-First Search (DFS)
 	public static List<Node> dfs(Node start) {

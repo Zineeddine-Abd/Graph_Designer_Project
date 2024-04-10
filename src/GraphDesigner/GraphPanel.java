@@ -5,7 +5,6 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 
 import GraphAlgorithms.Algorithms;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -195,6 +194,7 @@ public class GraphPanel extends JPanel {
         hierholzerButton.addActionListener(e -> {
             if (!nodes.isEmpty()) {
                 List<Node> circuit = Algorithms.hierholzerEulerianPath(nodes);
+                fillNodesNeighbors();
                 displayResult("Hierholzer's Algorithm", circuit);
             } else {
                 JOptionPane.showMessageDialog(this, "No nodes in the graph.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -207,6 +207,7 @@ public class GraphPanel extends JPanel {
         fleuryButton.addActionListener(e -> {
             if (!nodes.isEmpty()) {
                 List<Node> path = Algorithms.fleuryEulerianPath(nodes);
+                fillNodesNeighbors();
                 displayResult("Fleury's Algorithm", path);
             } else {
                 JOptionPane.showMessageDialog(this, "No nodes in the graph.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -230,21 +231,9 @@ public class GraphPanel extends JPanel {
         });
         leftPanel.add(flowsButton);
 
-        JButton dfsEulerianButton = new JButton("DFS Eulerian Path");
-        dfsEulerianButton.setBounds(200, 310, 160, 30);
-        dfsEulerianButton.addActionListener(e -> {
-            if (!nodes.isEmpty()) {
-                List<Node> path = Algorithms.dfsEulerianPath(nodes);
-                displayResult("DFS Eulerian Path", path);
-            } else {
-                JOptionPane.showMessageDialog(this, "No nodes in the graph.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
-        leftPanel.add(dfsEulerianButton);
-
         
         JButton dfsButton = new JButton("Depth-First Search");
-        dfsButton.setBounds(200, 350, 160, 30);
+        dfsButton.setBounds(200, 310, 160, 30);
         dfsButton.addActionListener(e -> {
             Node startNode = nodes.isEmpty() ? null : nodes.get(0);
             if (startNode != null) {
@@ -261,7 +250,7 @@ public class GraphPanel extends JPanel {
         leftPanel.add(dfsButton);
 
         JButton bfsButton = new JButton("Breadth-First Search");
-        bfsButton.setBounds(200, 390, 160, 30);
+        bfsButton.setBounds(200, 350, 160, 30);
         bfsButton.addActionListener(e -> {
             Node startNode = nodes.isEmpty() ? null : nodes.get(0);
             if (startNode != null) {
@@ -518,14 +507,18 @@ public class GraphPanel extends JPanel {
         }
     }
     
-    private void fillNodesNeighbors() {
+    public void fillNodesNeighbors() {
+    	
+    	//List<Edge> edgesToAdd = new ArrayList<>();
     	for (Node node : nodes) {
     		
     		for (Edge edge : edges) {
     			if(edge.getStart() == node) {
     				node.getEdges().add(edge);
+    				//edgesToAdd.add(edge);
     			}
     		}
+    		//node.setEdges(edgesToAdd);
     	}
     }
     
@@ -659,7 +652,12 @@ public class GraphPanel extends JPanel {
                         Edge edge = new Edge(selectedNode1, selectedNode2, weight);
                         edges.add(edge);
                         selectedNode1.addEdge(edge);
-                        //selectedNode2.addEdge(edge);
+                        if (!directed) {
+        	                // If the graph is undirected, add the reverse edge
+        	                Edge reverseEdge = new Edge(selectedNode2, selectedNode1, weight);
+        	                selectedNode2.addEdge(reverseEdge);
+        	                edges.add(reverseEdge);
+        	            }
                         weightTextField.setText("");
                         weightLabel.setVisible(false);
                         weightTextField.setVisible(false);
@@ -670,7 +668,12 @@ public class GraphPanel extends JPanel {
                     	Edge edge = new Edge(selectedNode1, selectedNode2);
                         edges.add(edge);
                         selectedNode1.addEdge(edge);
-                        //selectedNode2.addEdge(edge);
+                        if (!directed) {
+        	                // If the graph is undirected, add the reverse edge
+        	                Edge reverseEdge = new Edge(selectedNode2, selectedNode1);
+        	                selectedNode2.addEdge(reverseEdge);
+        	                edges.add(reverseEdge);
+        	            }
                     }
                     selectedNode1 = null;
                     selectedNode2 = null;
@@ -693,7 +696,12 @@ public class GraphPanel extends JPanel {
             Edge edge = new Edge(selectedNode1, selectedNode2, weight);
             edges.add(edge);
             selectedNode1.addEdge(edge);
-            //selectedNode2.addEdge(edge);
+            if (!directed) {
+                // If the graph is undirected, add the reverse edge
+                Edge reverseEdge = new Edge(selectedNode2, selectedNode1, weight);
+                selectedNode2.addEdge(reverseEdge);
+                edges.add(reverseEdge);
+            }
             selectedNode1 = null;
             selectedNode2 = null;
             weightTextField.setText("");
@@ -703,15 +711,6 @@ public class GraphPanel extends JPanel {
         }
     }
     
-//    private void removeEdgeFromNodes(Edge edgeToRemove) {
-//      
-//        for (Node node : nodes) {
-//        	if(node.getEdges().contains(edgeToRemove)) {
-//        		node.getEdges().remove(edgeToRemove);
-//        	}
-//        }
-//        
-//    }
     
     private void removeEdge(Point clickPoint) {
         for (Edge edge : edges) {
@@ -719,7 +718,14 @@ public class GraphPanel extends JPanel {
                 selectedEdge = edge;
                 edges.remove(edge);
                 selectedEdge.getStart().getEdges().remove(edge);
-                selectedEdge.getEnd().getEdges().remove(edge);
+                if (!directed) {
+    	            // If the graph is undirected, remove the reverse edge
+    	            Node destination = edge.getEnd();
+    	            // crate the reverse edge temporarly to search for it
+    	            Edge reverseEdge = new Edge(destination, edge.getStart(), edge.getWeight());
+    	            destination.getEdges().remove(reverseEdge);
+    	            edges.remove(reverseEdge);
+    	        }
                 repaint();
                 break;
             }

@@ -16,9 +16,10 @@ import GraphDesigner.*;
 
 public class Algorithms{
 	
+	// A graph is Hamiltonian if it has a cycle that visits each node of the graph exactly once
+    // We can use backtracking to check if such a cycle exists
 	public static boolean isHamiltonian(List<Node> nodes, List<Edge> edges) {
-	    // A graph is Hamiltonian if it has a cycle that visits each node of the graph exactly once
-	    // We can use backtracking to check if such a cycle exists
+		
 	    int size = nodes.size();
 	    boolean[] visited = new boolean[size];
 	    Arrays.fill(visited, false);
@@ -69,12 +70,11 @@ public class Algorithms{
 	}
 	
 	
-	
 	// Check if the graph is Eulerian
+	// A graph is Eulerian if all of its vertices have even degree
 	public static boolean isEulerian(List<Node> nodes, List<Edge> edges) {
-	    // A graph is Eulerian if all of its vertices have even degree
+	    
 	    for (Node node : nodes) {
-	    	System.out.println(node.getNodeName() + " - Edges : " + node.getEdges().size());
 	        if (node.getEdges().size() % 2 != 0) {
 	            return false;
 	        }
@@ -82,9 +82,22 @@ public class Algorithms{
 	    return true;
 	}
 	
+	// Check if the graph is SemiEulerian
+	// A graph is SemiEulerian if it has exactly two nodes that have odd degree
+	public static boolean isSemiEulerian(List<Node> nodes) {
+        int oddDegreeCount = 0;
+        for (Node node : nodes) {
+            if (node.getEdges().size() % 2 != 0) {
+                oddDegreeCount++;
+            }
+        }
+        return oddDegreeCount == 2;
+    }
+	
 	// Find flows in the graph
+	// Use BFS to find all possible flows
 	public static List<List<Node>> findFlows(List<Node> nodes, List<Edge> edges) {
-	    // Use BFS to find all possible flows
+	    
 	    List<List<Node>> flows = new ArrayList<>();
 	    for (Node start : nodes) {
 	        List<Node> flow = new ArrayList<>();
@@ -96,7 +109,7 @@ public class Algorithms{
 	            Node current = queue.poll();
 	            flow.add(current);
 	            for (Edge edge : current.getEdges()) {
-	                Node neighbor = edge.getStart() == current ? edge.getEnd() : edge.getStart();
+	                Node neighbor = edge.getEnd();
 	                if (!visited.contains(neighbor)) {
 	                    queue.add(neighbor);
 	                    visited.add(neighbor);
@@ -107,40 +120,34 @@ public class Algorithms{
 	    }
 	    return flows;
 	}
+
 	
-	public static boolean isSemiEulerian(List<Node> nodes) {
-        int oddDegreeCount = 0;
-        for (Node node : nodes) {
-            if (node.getEdges().size() % 2 != 0) {
-                oddDegreeCount++;
-            }
-        }
-        return oddDegreeCount == 2;
-    }
+	public static List<Node> hierholzerEulerianPath(List<Node> nodes) {
+	    List<Node> circuit = new ArrayList<>();
+	    Stack<Node> stack = new Stack<>();
+	    if (nodes.isEmpty())
+	        return circuit;
 
-    public static List<Node> hierholzerEulerianPath(List<Node> nodes) {
-        List<Node> circuit = new ArrayList<>();
-        Stack<Node> stack = new Stack<>();
-        if (nodes.isEmpty())
-            return circuit;
+	    Node start = nodes.get(0); // Start from the first node
+	    stack.push(start);
+	    while (!stack.isEmpty()) {
+	        Node current = stack.peek();
+	        if (!current.getEdges().isEmpty()) {
+	            Edge edge = current.getEdges().get(0); // Get the first edge
+	            stack.push(edge.getEnd()); // Move to the next node
+	            // Remove the edge from the graph
+	            current.getEdges().remove(edge);
+	            edge.getEnd().getEdges().removeIf(e -> e.getEnd().equals(current)); // Remove the reverse edge
+	        } else {
+	            circuit.add(stack.pop());
+	        }
+	    }
 
-        Node start = nodes.get(0); // Start from the first node
-        stack.push(start);
-        while (!stack.isEmpty()) {
-            Node current = stack.peek();
-            if (!current.getEdges().isEmpty()) {
-                Edge edge = current.getEdges().remove(0); // Get the first edge
-                stack.push(edge.getEnd()); // Move to the next node
-            } else {
-                circuit.add(stack.pop());
-            }
-        }
+	    Collections.reverse(circuit); // Reverse the circuit
+	    return circuit;
+	}
 
-        Collections.reverse(circuit); // Reverse the circuit
-        return circuit;
-    }
-
-    public static List<Node> fleuryEulerianPath(List<Node> nodes) {
+	public static List<Node> fleuryEulerianPath(List<Node> nodes) {
         List<Node> path = new ArrayList<>();
         if (nodes.isEmpty())
             return path;
@@ -161,19 +168,29 @@ public class Algorithms{
     }
 
     private static void eulerianPath(Node node, List<Node> path) {
-    	Set<Edge> visitedEdges = new HashSet<>();
-    	for (Edge edge : node.getEdges()) {
-            if (!visitedEdges.contains(edge) && !createsBridge(edge)) {
-                visitedEdges.add(edge);
-                eulerianPath(edge.getEnd(), path);
+        while (!node.getEdges().isEmpty()) {
+            Edge chosenEdge = null;
+            for (Edge edge : node.getEdges()) {
+                if (!createsBridge(edge, new HashSet<>())) {
+                    chosenEdge = edge;
+                    break;
+                }
             }
+            if (chosenEdge == null) {
+                chosenEdge = node.getEdges().get(0); // If all edges create bridges, choose any edge
+            }
+
+            path.add(node); // Add the current node to the path
+            Node nextNode = chosenEdge.getEnd();
+            node.getEdges().remove(chosenEdge); // Remove the chosen edge from the current node
+            chosenEdge.getEnd().getEdges().removeIf(e -> e.getEnd().equals(node)); // Remove the reverse edge
+            eulerianPath(nextNode, path); // Recur to the next node
         }
-        path.add(node);
+        path.add(node); // Add the current node again to close the circuit
     }
 
-    private static boolean createsBridge(Edge edge) {
-    	Set<Edge> visitedEdges = new HashSet<>();
-    	int count = 0;
+    private static boolean createsBridge(Edge edge, Set<Edge> visitedEdges) {
+        int count = 0;
         for (Edge e : edge.getEnd().getEdges()) {
             if (!visitedEdges.contains(e))
                 count++;
@@ -181,28 +198,7 @@ public class Algorithms{
         return count == 1; // If removing this edge creates a bridge
     }
 
-    public static List<Node> dfsEulerianPath(List<Node> nodes) {
-    	List<Node> path = new ArrayList<>();
-        if (nodes.isEmpty())
-            return path;
-
-        Node start = nodes.get(0); // Start from the first node
-        dfs(start, path);
-        return path;
-    }
-
-    private static void dfs(Node node, List<Node> path) {
-    	Set<Edge> visitedEdges = new HashSet<>();
-    	while (!node.getEdges().isEmpty()) {
-            Edge edge = node.getEdges().remove(0); // Get the first edge
-            if (!visitedEdges.contains(edge)) {
-                visitedEdges.add(edge);
-                dfs(edge.getEnd(), path);
-            }
-        }
-        path.add(node);
-    }
-	
+    
 	// Depth-First Search (DFS)
 	public static List<Node> dfs(Node start) {
 	    List<Node> visited = new ArrayList<>();
@@ -217,7 +213,7 @@ public class Algorithms{
 	            visited.add(currentNode);
 	            visitedSet.add(currentNode);
 	            for (Edge edge : currentNode.getEdges()) {
-	                Node neighbor = edge.getStart() == currentNode ? edge.getEnd() : edge.getStart();
+	                Node neighbor = edge.getEnd();
 	                if (!visitedSet.contains(neighbor)) {
 	                    stack.push(neighbor);
 	                }
@@ -240,7 +236,7 @@ public class Algorithms{
 	        Node current = queue.poll();
 	        visited.add(current);
 	        for (Edge edge : current.getEdges()) {
-	            Node neighbor = edge.getStart() == current ? edge.getEnd() : edge.getStart();
+	            Node neighbor = edge.getEnd();
 	            if (!visitedSet.contains(neighbor)) {
 	                queue.add(neighbor);
 	                visitedSet.add(neighbor);

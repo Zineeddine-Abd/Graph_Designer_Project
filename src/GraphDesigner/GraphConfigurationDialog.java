@@ -79,7 +79,7 @@ public class GraphConfigurationDialog extends JDialog {
         add(panel, BorderLayout.CENTER);
         add(saveButton, BorderLayout.SOUTH);
     }
-    
+   
     
     private void loadGraphFromFile() {
     	
@@ -120,6 +120,7 @@ public class GraphConfigurationDialog extends JDialog {
                 GraphDesigner graphDesigner = new GraphDesigner(loadedDirected, loadedWeighted);
                 graphDesigner.getGraphPanel().getNodes().addAll(loadedNodes);
                 graphDesigner.getGraphPanel().getEdges().addAll(loadedEdges);
+                graphDesigner.getGraphPanel().fillNodesNeighbors();
                 graphDesigner.getGraphPanel().repaint();
                 graphDesigner.setVisible(true);
                 

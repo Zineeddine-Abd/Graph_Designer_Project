@@ -123,79 +123,129 @@ public class Algorithms{
 
 	
 	public static List<Node> hierholzerEulerianPath(List<Node> nodes) {
-	    List<Node> circuit = new ArrayList<>();
-	    Stack<Node> stack = new Stack<>();
-	    if (nodes.isEmpty())
-	        return circuit;
-
-	    Node start = nodes.get(0); // Start from the first node
-	    stack.push(start);
-	    while (!stack.isEmpty()) {
-	        Node current = stack.peek();
-	        if (!current.getEdges().isEmpty()) {
-	            Edge edge = current.getEdges().get(0); // Get the first edge
-	            stack.push(edge.getEnd()); // Move to the next node
-	            // Remove the edge from the graph
-	            current.getEdges().remove(edge);
-	            edge.getEnd().getEdges().removeIf(e -> e.getEnd().equals(current)); // Remove the reverse edge
-	        } else {
-	            circuit.add(stack.pop());
-	        }
-	    }
-
-	    Collections.reverse(circuit); // Reverse the circuit
-	    return circuit;
-	}
-
-	public static List<Node> fleuryEulerianPath(List<Node> nodes) {
-        List<Node> path = new ArrayList<>();
+        List<Node> circuit = new ArrayList<>();
+        Stack<Node> stack = new Stack<>();
+        
         if (nodes.isEmpty())
-            return path;
+            return circuit;
 
-        // Find a node with an odd degree (if any)
-        Node start = null;
-        for (Node node : nodes) {
-            if (node.getEdges().size() % 2 != 0) {
-                start = node;
-                break;
+        // Find a node with non-zero degree to start the traversal
+        Node start = findStartNode(nodes);
+        if (start == null) // No suitable start node found
+            return circuit;
+
+        stack.push(start);
+        
+        while (!stack.isEmpty()) {
+            Node current = stack.peek();
+            
+            // Check if there are remaining unvisited edges from the current node
+            if (!current.getEdges().isEmpty()) {
+                Edge edge = current.getEdges().remove(0); // Remove the first edge
+                edge.getEnd().getEdges().removeIf(e -> e.getEnd().equals(current)); // Remove the reverse edge
+                stack.push(edge.getEnd()); // Move to the next node
+            } else {
+                circuit.add(stack.pop());
             }
         }
-        if (start == null) // If all nodes have even degree, start from any node
-            start = nodes.get(0);
 
-        eulerianPath(start, path);
+        return circuit;
+    }
+
+    // Find a node with non-zero degree to start the traversal
+    private static Node findStartNode(List<Node> nodes) {
+        for (Node node : nodes) {
+            if (!node.getEdges().isEmpty())
+                return node;
+        }
+        return null;
+    }
+
+    public static List<Node> fleuryEulerianPath(List<Node> nodes) {
+        List<Node> path = new ArrayList<>();
+        
+        // Find a starting node with odd degree
+        Node start = findStartNodeFleury(nodes);
+        
+        if (start == null)
+            return path; // No Eulerian path exists
+        
+        // Perform the Eulerian tour
+        eulerianTour(start, path);
+        
         return path;
     }
 
-    private static void eulerianPath(Node node, List<Node> path) {
-        while (!node.getEdges().isEmpty()) {
-            Edge chosenEdge = null;
-            for (Edge edge : node.getEdges()) {
-                if (!createsBridge(edge, new HashSet<>())) {
-                    chosenEdge = edge;
-                    break;
-                }
-            }
-            if (chosenEdge == null) {
-                chosenEdge = node.getEdges().get(0); // If all edges create bridges, choose any edge
-            }
+    private static void eulerianTour(Node current, List<Node> path) {
+        while (!current.getEdges().isEmpty()) {
+            Edge edge = current.getEdges().get(0); // Get the first edge
+            Node next = edge.getEnd();
+            final Node currentNode = current; // Final copy of current node
 
-            path.add(node); // Add the current node to the path
-            Node nextNode = chosenEdge.getEnd();
-            node.getEdges().remove(chosenEdge); // Remove the chosen edge from the current node
-            chosenEdge.getEnd().getEdges().removeIf(e -> e.getEnd().equals(node)); // Remove the reverse edge
-            eulerianPath(nextNode, path); // Recur to the next node
+            // If removing the edge doesn't disconnect the graph, or if it's the only option, use it
+            if (isBridge(currentNode, next) || currentNode.getEdges().size() == 1) {
+                currentNode.getEdges().remove(edge);
+                next.getEdges().removeIf(e -> e.getEnd().equals(currentNode));
+                eulerianTour(next, path);
+            } else {
+                // Move to the next edge
+                currentNode.getEdges().remove(edge);
+                next.getEdges().removeIf(e -> e.getEnd().equals(currentNode));
+                path.add(currentNode);
+                current = next;
+            }
         }
-        path.add(node); // Add the current node again to close the circuit
+        path.add(current);
     }
 
-    private static boolean createsBridge(Edge edge, Set<Edge> visitedEdges) {
-        int count = 0;
-        for (Edge e : edge.getEnd().getEdges()) {
-            if (!visitedEdges.contains(e))
-                count++;
+
+    private static boolean isBridge(Node u, Node v) {
+        // Check if removing the edge disconnects the graph
+        int componentsBeforeRemoval = countConnectedComponents(u.getEdges());
+        
+        // Temporarily remove the edge
+        u.getEdges().removeIf(e -> e.getEnd().equals(v));
+        v.getEdges().removeIf(e -> e.getEnd().equals(u));
+
+        // Count the number of connected components after removal
+        int componentsAfterRemoval = countConnectedComponents(u.getEdges());
+
+        // Restore the removed edge
+        u.addEdge(new Edge(u, v));
+        v.addEdge(new Edge(v, u));
+
+        return componentsAfterRemoval > componentsBeforeRemoval;
+    }
+
+    private static int countConnectedComponents(List<Edge> edges) {
+        List<Node> visited = new ArrayList<>();
+        int components = 0;
+        for (Edge edge : edges) {
+            Node start = edge.getStart();
+            if (!visited.contains(start)) {
+                dfs(start, visited);
+                components++;
+            }
         }
-        return count == 1; // If removing this edge creates a bridge
+        return components;
+    }
+
+    private static void dfs(Node node, List<Node> visited) {
+        visited.add(node);
+        for (Edge edge : node.getEdges()) {
+            Node neighbor = edge.getEnd();
+            if (!visited.contains(neighbor)) {
+                dfs(neighbor, visited);
+            }
+        }
+    }
+
+    private static Node findStartNodeFleury(List<Node> nodes) {
+        for (Node node : nodes) {
+            if (node.getEdges().size() % 2 != 0)
+                return node;
+        }
+        return null;
     }
 
     

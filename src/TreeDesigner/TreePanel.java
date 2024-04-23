@@ -98,6 +98,7 @@ public class TreePanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 String nodeName = nodeNameField.getText().trim();
                 removeNode(nodeName);
+                //no root node exists
                 if (nodesMap.isEmpty()) {
                     addRootButton.setEnabled(true);
                 }

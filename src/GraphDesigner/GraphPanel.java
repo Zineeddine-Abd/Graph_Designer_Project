@@ -1,8 +1,10 @@
 package GraphDesigner;
 
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import GraphAlgorithms.Algorithms;
 import java.awt.*;
@@ -10,11 +12,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -56,6 +60,8 @@ public class GraphPanel extends JPanel {
     private JButton removeEdgeButton;
 
     private JButton generateMatrixButton;
+    private BufferedImage offScreenImage;  // Off-screen image for buffering
+
 
     public GraphPanel(boolean directed, boolean weighted) {
     	
@@ -159,8 +165,15 @@ public class GraphPanel extends JPanel {
         JButton eulerianButton = new JButton("Check Eulerian");
         eulerianButton.setBounds(10, 310, 160, 30);
         eulerianButton.addActionListener(e -> {
+        	boolean isEulerian;
         	if(!nodes.isEmpty()) {
-	            boolean isEulerian = Algorithms.isEulerian(nodes, edges);
+        		if(directed) {
+        			isEulerian = Algorithms.isEulerianDirected(nodes);
+        		}
+        		else {
+        			isEulerian = Algorithms.isEulerian(nodes);
+        		}
+
 	            if (isEulerian) {
 	                JOptionPane.showMessageDialog(this, "The graph is Eulerian.", "Eulerian Graph", JOptionPane.INFORMATION_MESSAGE);
 	            } else {
@@ -176,8 +189,17 @@ public class GraphPanel extends JPanel {
         JButton semiEulerianButton = new JButton("Check Semi-Eulerian");
         semiEulerianButton.setBounds(10, 350, 160, 30);
         semiEulerianButton.addActionListener(e -> {
+        	
+            boolean isSemiEulerian;
+            
             if (!nodes.isEmpty()) {
-                boolean isSemiEulerian = Algorithms.isSemiEulerian(nodes);
+            	if(directed) {
+        			isSemiEulerian = Algorithms.isSemiEulerianDirected(nodes);
+        		}
+        		else {
+        			isSemiEulerian = Algorithms.isSemiEulerian(nodes);
+        		}
+
                 if (isSemiEulerian) {
 	                JOptionPane.showMessageDialog(this, "The graph is Semi Eulerian.", "Semi Eulerian Graph", JOptionPane.INFORMATION_MESSAGE);
 	            } else {
@@ -192,10 +214,24 @@ public class GraphPanel extends JPanel {
         JButton hierholzerButton = new JButton("Hierholzer's Algorithm");
         hierholzerButton.setBounds(10, 390, 160, 30);
         hierholzerButton.addActionListener(e -> {
+        	
+        	List<Node> circuit = new ArrayList<>();
+        	
             if (!nodes.isEmpty()) {
-                List<Node> circuit = Algorithms.hierholzerEulerianPath(nodes);
-                fillNodesNeighbors();
-                displayResult("Hierholzer's Algorithm", circuit);
+            	if(directed) {
+            		circuit = Algorithms.hierholzerEulerianPathDirected(nodes,edges);
+            	}
+            	else {
+            		circuit = Algorithms.hierholzerEulerianPath(nodes);
+
+            	}
+            	fillNodesNeighbors();
+                if(circuit != null) {     
+	                displayResult("Hierholzer's Algorithm", circuit);
+            	}
+                else {
+                	JOptionPane.showMessageDialog(this, "the graph doesn't contains any circuits or paths.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
             } else {
                 JOptionPane.showMessageDialog(this, "No nodes in the graph.", "Error", JOptionPane.ERROR_MESSAGE);
             }
@@ -265,6 +301,16 @@ public class GraphPanel extends JPanel {
             }
         });
         leftPanel.add(bfsButton);
+        
+        JButton ScreenshotButton = new JButton("Take Screenshot");
+        ScreenshotButton.setBounds(200, 390, 160, 30);
+        ScreenshotButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                saveGraphImage();
+            }
+        });
+        leftPanel.add(ScreenshotButton);
         
         
         JButton loadGraphButton = new JButton("Load Graph");
@@ -393,7 +439,8 @@ public class GraphPanel extends JPanel {
         rightPanel.addMouseListener(new MouseAdapter() { //MouseAdapter class in Java is an abstract adapter class that implements the MouseListener interface.
             @Override                                    //It provides default implementations for all the methods in the MouseListener interface
             public void mouseClicked(MouseEvent e) {	 //so i can implement just the methods i want to implement
-                super.mouseClicked(e);
+                
+            	super.mouseClicked(e);
                 Point clickedPoint = e.getPoint();
                     switch (mode) {
                         case ADD_NODE:
@@ -589,7 +636,29 @@ public class GraphPanel extends JPanel {
             }
         }
     }
+    
+    private void saveGraphImage() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Save Graph As Image");
+        fileChooser.setFileFilter(new FileNameExtensionFilter("PNG Images", "png"));
 
+        int userSelection = fileChooser.showSaveDialog(this);
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File fileToSave = fileChooser.getSelectedFile();
+            try {
+                BufferedImage image = new BufferedImage(800, 600, BufferedImage.TYPE_INT_RGB);
+                Graphics2D g2d = image.createGraphics();
+                rightPanel.paint(g2d);
+                g2d.dispose();
+
+                ImageIO.write(image, "png", fileToSave);
+                JOptionPane.showMessageDialog(this, "Graph saved successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error saving graph: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
 
     private void addNode(Point point) {
         String nodeName = nodeNameTextField.getText();

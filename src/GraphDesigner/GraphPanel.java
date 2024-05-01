@@ -288,7 +288,7 @@ public class GraphPanel extends JPanel {
         // Add label for designer information
         JLabel designerLabel = new JLabel("Designed by Zine eddine ABDELADIM");
         designerLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-        designerLabel.setBounds(10, 750, 290, 70);
+        designerLabel.setBounds(35, 750, 290, 70);
         designerLabel.setHorizontalAlignment(SwingConstants.CENTER);
         designerLabel.setVerticalAlignment(SwingConstants.CENTER);
         
@@ -397,10 +397,15 @@ public class GraphPanel extends JPanel {
     
     //Main methods
     private void executeAlgorithm(String algorithmName) {
+    	boolean isHamiltonian = false;
         switch (algorithmName) {
             case "Check Hamiltonian":
                 if (!nodes.isEmpty()) {
-                    boolean isHamiltonian = Algorithms.isHamiltonian(nodes, edges);
+                	if (directed) {
+                		isHamiltonian = Algorithms.isHamiltonianDirected(nodes, edges);
+                	}else {
+                		isHamiltonian = Algorithms.isHamiltonian(nodes, edges);
+                	}
                     if (isHamiltonian) {
                         JOptionPane.showMessageDialog(this, "The graph is Hamiltonian.", "Hamiltonian Graph", JOptionPane.INFORMATION_MESSAGE);
                     } else {
@@ -448,9 +453,9 @@ public class GraphPanel extends JPanel {
                 List<Node> circuit = new ArrayList<>();
                 if (!nodes.isEmpty()) {
                     if (directed) {
-                        circuit = Algorithms.hierholzerEulerianPathDirected(nodes, edges);
+                        circuit = Algorithms.hierholzerDirected(nodes);
                     } else {
-                        circuit = Algorithms.hierholzerEulerianPath(nodes);
+                        circuit = Algorithms.hierholzer(nodes);
                     }
                     fillNodesNeighbors();
                     if (circuit != null) {
@@ -462,27 +467,15 @@ public class GraphPanel extends JPanel {
                     JOptionPane.showMessageDialog(this, "No nodes in the graph.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
                 break;
-            case "Fleury's Algorithm":
-                if (!nodes.isEmpty()) {
-                    List<Node> path = Algorithms.fleuryEulerianPath(nodes);
-                    fillNodesNeighbors();
-                    displayResult("Fleury's Algorithm", path);
-                } else {
-                    JOptionPane.showMessageDialog(this, "No nodes in the graph.", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-                break;
-            case "Find Flows":
-                if (!nodes.isEmpty()) {
-                    List<List<Node>> flows = Algorithms.findFlows(nodes, edges);
-                    StringBuilder message = new StringBuilder("Flows in the graph:\n");
-                    for (List<Node> flow : flows) {
-                        message.append(flow).append("\n");
-                    }
-                    JOptionPane.showMessageDialog(this, message.toString(), "Graph Flows", JOptionPane.INFORMATION_MESSAGE);
-                } else {
-                    JOptionPane.showMessageDialog(this, "No nodes in the graph.", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-                break;
+//            case "Fleury's Algorithm":
+//                if (!nodes.isEmpty()) {
+//                    List<Node> path = Algorithms.fleury(nodes);
+//                    fillNodesNeighbors();
+//                    displayResult("Fleury's Algorithm", path);
+//                } else {
+//                    JOptionPane.showMessageDialog(this, "No nodes in the graph.", "Error", JOptionPane.ERROR_MESSAGE);
+//                }
+//                break;
             case "Depth-First Search":
                 Node startNodeDFS = nodes.isEmpty() ? null : nodes.get(0);
                 if (startNodeDFS != null) {
@@ -643,6 +636,18 @@ public class GraphPanel extends JPanel {
         }
     }
     
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        for (Edge edge : edges) {
+            edge.draw(g, weighted, directed);
+        }
+        for (Node node : nodes) {
+            node.draw(g);
+        }
+        
+    }
+    
     private void saveGraphImage() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Save Graph As Image");
@@ -652,9 +657,9 @@ public class GraphPanel extends JPanel {
         if (userSelection == JFileChooser.APPROVE_OPTION) {
             File fileToSave = fileChooser.getSelectedFile();
             try {
-                BufferedImage image = new BufferedImage(800, 600, BufferedImage.TYPE_INT_RGB);
-                Graphics2D g2d = image.createGraphics();
-                rightPanel.paint(g2d);
+                BufferedImage image = new BufferedImage(1160, getHeight(), BufferedImage.TYPE_INT_RGB);
+                Graphics g2d = image.createGraphics();
+                paintComponent(g2d);
                 g2d.dispose();
 
                 ImageIO.write(image, "png", fileToSave);

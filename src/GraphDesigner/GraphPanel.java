@@ -46,20 +46,26 @@ public class GraphPanel extends JPanel {
     // Track the selected node for dragging and the last mouse position for dragging
     private Node selectedNode = null;
     private Point lastMousePosition = null; 
-
+    
+    //Weight entries
     private JLabel weightLabel;
     private JTextField weightTextField;
     private boolean weightEntered = false;
-
+    
+    //add node buttons
     private JButton addNodeButton;
     private JButton removeNodeButton;
     private JTextField nodeNameTextField;
     private boolean addNodeClicked = false;
-
+    
+    //remove node buttons
     private JButton addEdgeButton;
     private JButton removeEdgeButton;
-
+    
+    //generate matrix button
     private JButton generateMatrixButton;
+    
+    //Screen shot variables
     private BufferedImage offScreenImage;  // Off-screen image for buffering
 
 
@@ -353,7 +359,8 @@ public class GraphPanel extends JPanel {
         JLabel nodeNameLabel = new JLabel("Node Name:");
         nodeNameLabel.setBounds(150, 70, 80, 30);
         leftPanel.add(nodeNameLabel);
-
+        
+        //adding listeners to node name textfeild
         nodeNameTextField = new JTextField();
         nodeNameTextField.setBounds(240, 70, 120, 30);
         nodeNameTextField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() { //anonymous inner class
@@ -509,6 +516,8 @@ public class GraphPanel extends JPanel {
         });
     }
     
+    
+    //Main methods
     private void displayResult(String algorithmName, List<Node> result) {
         StringBuilder message = new StringBuilder();
         message.append("Result of ").append(algorithmName).append(":\n");
@@ -920,7 +929,8 @@ public class GraphPanel extends JPanel {
         JOptionPane.showMessageDialog(this, matrixText.toString(), "Adjacency Matrix", JOptionPane.PLAIN_MESSAGE);
     }
 
-
+    
+    //Getters and Setters
     public List<Node> getNodes() {
         return nodes;
     }

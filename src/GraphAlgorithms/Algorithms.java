@@ -88,7 +88,7 @@ public class Algorithms{
 //	}
 	
 	
-	// Check if the graph is Eulerian
+	// Check Eulerian for undirected graphs
 	// A graph is Eulerian if all of its vertices have even degree
 	public static boolean isEulerian(List<Node> nodes) {
 	    
@@ -100,7 +100,7 @@ public class Algorithms{
 	    return true;
 	}
 	
-	// Check if the graph is SemiEulerian
+	// Check Semi Eulerian for undirected graphs
 	// A graph is SemiEulerian if it has exactly two nodes that have odd degree
 	public static boolean isSemiEulerian(List<Node> nodes) {
         int oddDegreeCount = 0;
@@ -153,6 +153,7 @@ public class Algorithms{
         return null;
     }
     
+    //Check Eulerian for directed graphs
     public static boolean isEulerianDirected(List<Node> nodes) {
         // Calculate in-degree and out-degree for each node
         Map<Node, Integer> inDegrees = new HashMap<>();
@@ -177,6 +178,7 @@ public class Algorithms{
         return true;
     }
     
+    //Check Semi Eulerian for directed graphs
     public static boolean isSemiEulerianDirected(List<Node> nodes) {
         // Calculate in-degree and out-degree for each node
         Map<Node, Integer> inDegrees = new HashMap<>();

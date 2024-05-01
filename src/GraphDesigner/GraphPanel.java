@@ -65,6 +65,10 @@ public class GraphPanel extends JPanel {
     //generate matrix button
     private JButton generateMatrixButton;
     
+    //Algorithms variables
+    private JComboBox<String> algorithmDropdown;
+    private JButton executeButton;
+    
     //Screen shot variables
     private BufferedImage offScreenImage;  // Off-screen image for buffering
 
@@ -150,166 +154,55 @@ public class GraphPanel extends JPanel {
         });
         leftPanel.add(removeEdgeButton);
         
-        //Add buttons for algorithms
-        JButton hamiltonianButton = new JButton("Check Hamiltonian");
-        hamiltonianButton.setBounds(10, 270, 160, 30);
-        hamiltonianButton.addActionListener(e -> {
-        	if(!nodes.isEmpty()) {
-	            boolean isHamiltonian = Algorithms.isHamiltonian(nodes, edges);
-	            if (isHamiltonian) {
-	                JOptionPane.showMessageDialog(this, "The graph is Hamiltonian.", "Hamiltonian Graph", JOptionPane.INFORMATION_MESSAGE);
-	            } else {
-	                JOptionPane.showMessageDialog(this, "The graph is not Hamiltonian.", "Hamiltonian Graph", JOptionPane.INFORMATION_MESSAGE);
-	            }
-        	}
-        	else {
-        		JOptionPane.showMessageDialog(this, "No nodes in the graph.", "Error", JOptionPane.ERROR_MESSAGE);
-        	}
-        });
-        leftPanel.add(hamiltonianButton);
-
-        JButton eulerianButton = new JButton("Check Eulerian");
-        eulerianButton.setBounds(10, 310, 160, 30);
-        eulerianButton.addActionListener(e -> {
-        	boolean isEulerian;
-        	if(!nodes.isEmpty()) {
-        		if(directed) {
-        			isEulerian = Algorithms.isEulerianDirected(nodes);
-        		}
-        		else {
-        			isEulerian = Algorithms.isEulerian(nodes);
-        		}
-
-	            if (isEulerian) {
-	                JOptionPane.showMessageDialog(this, "The graph is Eulerian.", "Eulerian Graph", JOptionPane.INFORMATION_MESSAGE);
-	            } else {
-	                JOptionPane.showMessageDialog(this, "The graph is not Eulerian.", "Eulerian Graph", JOptionPane.INFORMATION_MESSAGE);
-	            }
-        	}
-        	else {
-        		JOptionPane.showMessageDialog(this, "No nodes in the graph.", "Error", JOptionPane.ERROR_MESSAGE);
-        	}
-        });
-        leftPanel.add(eulerianButton);
+        //Graph Algorithms label
+        JLabel algorithmsLabel = new JLabel("GRAPH ALGORITHMS");
+        algorithmsLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        algorithmsLabel.setBounds(1, 270, 368, 50);
+        algorithmsLabel.setHorizontalAlignment(SwingConstants.CENTER); // Center align the text
+        algorithmsLabel.setForeground(Color.WHITE);
+        algorithmsLabel.setBackground(Color.GRAY); // Set the background color to yellow
+        algorithmsLabel.setOpaque(true); // Make sure to setOpaque(true) to make the background color visible
+        algorithmsLabel.setBorder(new LineBorder(Color.BLUE));
+        leftPanel.add(algorithmsLabel);
         
-        JButton semiEulerianButton = new JButton("Check Semi-Eulerian");
-        semiEulerianButton.setBounds(10, 350, 160, 30);
-        semiEulerianButton.addActionListener(e -> {
-        	
-            boolean isSemiEulerian;
-            
-            if (!nodes.isEmpty()) {
-            	if(directed) {
-        			isSemiEulerian = Algorithms.isSemiEulerianDirected(nodes);
-        		}
-        		else {
-        			isSemiEulerian = Algorithms.isSemiEulerian(nodes);
-        		}
-
-                if (isSemiEulerian) {
-	                JOptionPane.showMessageDialog(this, "The graph is Semi Eulerian.", "Semi Eulerian Graph", JOptionPane.INFORMATION_MESSAGE);
-	            } else {
-	                JOptionPane.showMessageDialog(this, "The graph is not Semi Eulerian.", "Semi Eulerian Graph", JOptionPane.INFORMATION_MESSAGE);
-	            }
-            } else {
-                JOptionPane.showMessageDialog(this, "No nodes in the graph.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
-        leftPanel.add(semiEulerianButton);
-
-        JButton hierholzerButton = new JButton("Hierholzer's Algorithm");
-        hierholzerButton.setBounds(10, 390, 160, 30);
-        hierholzerButton.addActionListener(e -> {
-        	
-        	List<Node> circuit = new ArrayList<>();
-        	
-            if (!nodes.isEmpty()) {
-            	if(directed) {
-            		circuit = Algorithms.hierholzerEulerianPathDirected(nodes,edges);
-            	}
-            	else {
-            		circuit = Algorithms.hierholzerEulerianPath(nodes);
-
-            	}
-            	fillNodesNeighbors();
-                if(circuit != null) {     
-	                displayResult("Hierholzer's Algorithm", circuit);
-            	}
-                else {
-                	JOptionPane.showMessageDialog(this, "the graph doesn't contains any circuits or paths.", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            } else {
-                JOptionPane.showMessageDialog(this, "No nodes in the graph.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
-        leftPanel.add(hierholzerButton);
-
-        JButton fleuryButton = new JButton("Fleury's Algorithm");
-        fleuryButton.setBounds(10, 430, 160, 30);
-        fleuryButton.addActionListener(e -> {
-            if (!nodes.isEmpty()) {
-                List<Node> path = Algorithms.fleuryEulerianPath(nodes);
-                fillNodesNeighbors();
-                displayResult("Fleury's Algorithm", path);
-            } else {
-                JOptionPane.showMessageDialog(this, "No nodes in the graph.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
-        leftPanel.add(fleuryButton);
-
-        JButton flowsButton = new JButton("Find Flows");
-        flowsButton.setBounds(200, 270, 160, 30);
-        flowsButton.addActionListener(e -> {
-            if (!nodes.isEmpty()) {
-                List<List<Node>> flows = Algorithms.findFlows(nodes, edges);
-                StringBuilder message = new StringBuilder("Flows in the graph:\n");
-                for (List<Node> flow : flows) {
-                    message.append(flow).append("\n");
-                }
-                JOptionPane.showMessageDialog(this, message.toString(), "Graph Flows", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(this, "No nodes in the graph.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
-        leftPanel.add(flowsButton);
-
+        //Dropdown menu for algorithm selection
+        String[] algorithms = {"Check Hamiltonian", "Check Eulerian", "Check Semi-Eulerian", "Hierholzer's Algorithm" , "Fleury's Algorithm" , "Depth-First Search" , "Breadth-First Search"};
+        algorithmDropdown = new JComboBox<>(algorithms);
+        algorithmDropdown.setBorder(new LineBorder(Color.BLACK));
+        algorithmDropdown.setBounds(10, 350, 160, 30);
+        leftPanel.add(algorithmDropdown);
         
-        JButton dfsButton = new JButton("Depth-First Search");
-        dfsButton.setBounds(200, 310, 160, 30);
-        dfsButton.addActionListener(e -> {
-            Node startNode = nodes.isEmpty() ? null : nodes.get(0);
-            if (startNode != null) {
-                List<Node> dfsResult = Algorithms.dfs(startNode);
-                StringBuilder message = new StringBuilder("Depth-First Search result:\n");
-                for (Node node : dfsResult) {
-                    message.append(node).append("\n");
-                }
-                JOptionPane.showMessageDialog(this, message.toString(), "DFS Result", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(this, "No nodes in the graph.", "Error", JOptionPane.ERROR_MESSAGE);
+        // Button to execute the selected algorithm
+        executeButton = new JButton("Execute");
+        executeButton.setBorder(new LineBorder(Color.BLACK));
+        executeButton.setBounds(190, 350, 160, 30);
+        executeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                executeAlgorithm((String) algorithmDropdown.getSelectedItem());
             }
         });
-        leftPanel.add(dfsButton);
-
-        JButton bfsButton = new JButton("Breadth-First Search");
-        bfsButton.setBounds(200, 350, 160, 30);
-        bfsButton.addActionListener(e -> {
-            Node startNode = nodes.isEmpty() ? null : nodes.get(0);
-            if (startNode != null) {
-                List<Node> bfsResult = Algorithms.bfs(startNode);
-                StringBuilder message = new StringBuilder("Breadth-First Search result:\n");
-                for (Node node : bfsResult) {
-                    message.append(node).append("\n");
-                }
-                JOptionPane.showMessageDialog(this, message.toString(), "BFS Result", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(this, "No nodes in the graph.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
-        leftPanel.add(bfsButton);
+        leftPanel.add(executeButton);
         
+        JButton loadGraphButton = new JButton("Load Graph");
+        Font loadButtonFont = new Font("Arial", Font.BOLD, 20);
+        loadGraphButton.setFont(loadButtonFont);
+        loadGraphButton.setBorder(new LineBorder(Color.BLUE));
+        
+        loadGraphButton.setBounds(10, 500, 350, 50);
+        loadGraphButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                loadGraphFromFile();
+            }
+        });
+        leftPanel.add(loadGraphButton);
+    
         JButton ScreenshotButton = new JButton("Take Screenshot");
-        ScreenshotButton.setBounds(200, 390, 160, 30);
+        ScreenshotButton.setBounds(10, 570, 350, 50);
+        Font screenShotButtonFont = new Font("Arial", Font.BOLD, 20);
+        ScreenshotButton.setFont(screenShotButtonFont);
+        ScreenshotButton.setBorder(new LineBorder(Color.BLUE));
         ScreenshotButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -319,27 +212,12 @@ public class GraphPanel extends JPanel {
         leftPanel.add(ScreenshotButton);
         
         
-        JButton loadGraphButton = new JButton("Load Graph");
-        Font loadButtonFont = new Font("Arial", Font.BOLD, 20);
-        loadGraphButton.setFont(loadButtonFont);
-        loadGraphButton.setBorder(new LineBorder(Color.BLUE));
-        
-        loadGraphButton.setBounds(10, 580, 350, 50);
-        loadGraphButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                loadGraphFromFile();
-            }
-        });
-        leftPanel.add(loadGraphButton);
-    
-
         generateMatrixButton = new JButton("Generate Adjacency Matrix");
         Font matrixButtonFont = new Font("Arial", Font.BOLD, 20);
         generateMatrixButton.setFont(matrixButtonFont);
         generateMatrixButton.setBorder(new LineBorder(Color.BLUE));
         
-        generateMatrixButton.setBounds(10, 650, 350, 50);
+        generateMatrixButton.setBounds(10, 640, 350, 50);
         generateMatrixButton.addActionListener(e -> {
             generateAndDisplayAdjacencyMatrix();
         });
@@ -401,7 +279,7 @@ public class GraphPanel extends JPanel {
         JLabel maximizeLabel = new JLabel("<html><div style='text-align: center;'>You should maximize the window for better experience</div></html>");
         maximizeLabel.setFont(new Font("Arial", Font.BOLD, 20));
         maximizeLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        maximizeLabel.setBounds(10, 500, 350, 70);
+        maximizeLabel.setBounds(10, 400, 350, 70);
         // Set foreground color (text color) to red
         maximizeLabel.setForeground(Color.RED);
         // Set border to black
@@ -410,7 +288,7 @@ public class GraphPanel extends JPanel {
         // Add label for designer information
         JLabel designerLabel = new JLabel("Designed by Zine eddine ABDELADIM");
         designerLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-        designerLabel.setBounds(10, 750, 350, 70);
+        designerLabel.setBounds(10, 750, 290, 70);
         designerLabel.setHorizontalAlignment(SwingConstants.CENTER);
         designerLabel.setVerticalAlignment(SwingConstants.CENTER);
         
@@ -518,6 +396,125 @@ public class GraphPanel extends JPanel {
     
     
     //Main methods
+    private void executeAlgorithm(String algorithmName) {
+        switch (algorithmName) {
+            case "Check Hamiltonian":
+                if (!nodes.isEmpty()) {
+                    boolean isHamiltonian = Algorithms.isHamiltonian(nodes, edges);
+                    if (isHamiltonian) {
+                        JOptionPane.showMessageDialog(this, "The graph is Hamiltonian.", "Hamiltonian Graph", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(this, "The graph is not Hamiltonian.", "Hamiltonian Graph", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(this, "No nodes in the graph.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+            case "Check Eulerian":
+                boolean isEulerian;
+                if (!nodes.isEmpty()) {
+                    if (directed) {
+                        isEulerian = Algorithms.isEulerianDirected(nodes);
+                    } else {
+                        isEulerian = Algorithms.isEulerian(nodes);
+                    }
+                    if (isEulerian) {
+                        JOptionPane.showMessageDialog(this, "The graph is Eulerian.", "Eulerian Graph", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(this, "The graph is not Eulerian.", "Eulerian Graph", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(this, "No nodes in the graph.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+            case "Check Semi-Eulerian":
+                boolean isSemiEulerian;
+                if (!nodes.isEmpty()) {
+                    if (directed) {
+                        isSemiEulerian = Algorithms.isSemiEulerianDirected(nodes);
+                    } else {
+                        isSemiEulerian = Algorithms.isSemiEulerian(nodes);
+                    }
+                    if (isSemiEulerian) {
+                        JOptionPane.showMessageDialog(this, "The graph is Semi Eulerian.", "Semi Eulerian Graph", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(this, "The graph is not Semi Eulerian.", "Semi Eulerian Graph", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(this, "No nodes in the graph.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+            case "Hierholzer's Algorithm":
+                List<Node> circuit = new ArrayList<>();
+                if (!nodes.isEmpty()) {
+                    if (directed) {
+                        circuit = Algorithms.hierholzerEulerianPathDirected(nodes, edges);
+                    } else {
+                        circuit = Algorithms.hierholzerEulerianPath(nodes);
+                    }
+                    fillNodesNeighbors();
+                    if (circuit != null) {
+                        displayResult("Hierholzer's Algorithm", circuit);
+                    } else {
+                        JOptionPane.showMessageDialog(this, "the graph doesn't contains any circuits or paths.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(this, "No nodes in the graph.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+            case "Fleury's Algorithm":
+                if (!nodes.isEmpty()) {
+                    List<Node> path = Algorithms.fleuryEulerianPath(nodes);
+                    fillNodesNeighbors();
+                    displayResult("Fleury's Algorithm", path);
+                } else {
+                    JOptionPane.showMessageDialog(this, "No nodes in the graph.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+            case "Find Flows":
+                if (!nodes.isEmpty()) {
+                    List<List<Node>> flows = Algorithms.findFlows(nodes, edges);
+                    StringBuilder message = new StringBuilder("Flows in the graph:\n");
+                    for (List<Node> flow : flows) {
+                        message.append(flow).append("\n");
+                    }
+                    JOptionPane.showMessageDialog(this, message.toString(), "Graph Flows", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(this, "No nodes in the graph.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+            case "Depth-First Search":
+                Node startNodeDFS = nodes.isEmpty() ? null : nodes.get(0);
+                if (startNodeDFS != null) {
+                    List<Node> dfsResult = Algorithms.dfs(startNodeDFS);
+                    StringBuilder messageDFS = new StringBuilder("Depth-First Search result:\n");
+                    for (Node node : dfsResult) {
+                        messageDFS.append(node).append("\n");
+                    }
+                    JOptionPane.showMessageDialog(this, messageDFS.toString(), "DFS Result", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(this, "No nodes in the graph.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+            case "Breadth-First Search":
+                Node startNodeBFS = nodes.isEmpty() ? null : nodes.get(0);
+                if (startNodeBFS != null) {
+                    List<Node> bfsResult = Algorithms.bfs(startNodeBFS);
+                    StringBuilder messageBFS = new StringBuilder("Breadth-First Search result:\n");
+                    for (Node node : bfsResult) {
+                        messageBFS.append(node).append("\n");
+                    }
+                    JOptionPane.showMessageDialog(this, messageBFS.toString(), "BFS Result", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(this, "No nodes in the graph.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+            default:
+                System.out.println("Algorithm not found.");
+        }
+    }
+
+    
     private void displayResult(String algorithmName, List<Node> result) {
         StringBuilder message = new StringBuilder();
         message.append("Result of ").append(algorithmName).append(":\n");

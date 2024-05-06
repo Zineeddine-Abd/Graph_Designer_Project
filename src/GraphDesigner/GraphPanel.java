@@ -20,6 +20,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 
@@ -166,7 +167,7 @@ public class GraphPanel extends JPanel {
         leftPanel.add(algorithmsLabel);
         
         //Dropdown menu for algorithm selection
-        String[] algorithms = {"Check Hamiltonian", "Check Eulerian", "Check Semi-Eulerian", "Hierholzer's Algorithm" , "Fleury's Algorithm" , "Depth-First Search" , "Breadth-First Search"};
+        String[] algorithms = {"Check Hamiltonian", "Check Eulerian", "Check Semi-Eulerian", "Hierholzer's Algorithm" , "Fleury's Algorithm" , "Dijkstra's Algorithm" , "Dantzigs" , "Bellman-Ford Algorithm" , "Transitive Closure" , "Depth-First Search" , "Breadth-First Search"};
         algorithmDropdown = new JComboBox<>(algorithms);
         algorithmDropdown.setBorder(new LineBorder(Color.BLACK));
         algorithmDropdown.setBounds(10, 350, 160, 30);
@@ -419,7 +420,7 @@ public class GraphPanel extends JPanel {
                 boolean isEulerian;
                 if (!nodes.isEmpty()) {
                     if (directed) {
-                        isEulerian = Algorithms.isEulerianDirected(nodes);
+                        isEulerian = Algorithms.isEulerianDirected(nodes,edges);
                     } else {
                         isEulerian = Algorithms.isEulerian(nodes);
                     }
@@ -436,7 +437,7 @@ public class GraphPanel extends JPanel {
                 boolean isSemiEulerian;
                 if (!nodes.isEmpty()) {
                     if (directed) {
-                        isSemiEulerian = Algorithms.isSemiEulerianDirected(nodes);
+                        isSemiEulerian = Algorithms.isSemiEulerianDirected(nodes,edges);
                     } else {
                         isSemiEulerian = Algorithms.isSemiEulerian(nodes);
                     }
@@ -453,7 +454,7 @@ public class GraphPanel extends JPanel {
                 List<Node> circuit = new ArrayList<>();
                 if (!nodes.isEmpty()) {
                     if (directed) {
-                        circuit = Algorithms.hierholzerDirected(nodes);
+                        circuit = Algorithms.hierholzerDirected(nodes,edges);
                     } else {
                         circuit = Algorithms.hierholzer(nodes);
                     }
@@ -467,15 +468,15 @@ public class GraphPanel extends JPanel {
                     JOptionPane.showMessageDialog(this, "No nodes in the graph.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
                 break;
-//            case "Fleury's Algorithm":
-//                if (!nodes.isEmpty()) {
-//                    List<Node> path = Algorithms.fleury(nodes);
-//                    fillNodesNeighbors();
-//                    displayResult("Fleury's Algorithm", path);
-//                } else {
-//                    JOptionPane.showMessageDialog(this, "No nodes in the graph.", "Error", JOptionPane.ERROR_MESSAGE);
-//                }
-//                break;
+            case "Fleury's Algorithm":
+                if (!nodes.isEmpty()) {
+                    List<Node> path = Algorithms.fleuryDirected(nodes,edges);
+                    fillNodesNeighbors();
+                    displayResult("Fleury's Algorithm", path);
+                } else {
+                    JOptionPane.showMessageDialog(this, "No nodes in the graph.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
             case "Depth-First Search":
                 Node startNodeDFS = nodes.isEmpty() ? null : nodes.get(0);
                 if (startNodeDFS != null) {
@@ -498,6 +499,65 @@ public class GraphPanel extends JPanel {
                         messageBFS.append(node).append("\n");
                     }
                     JOptionPane.showMessageDialog(this, messageBFS.toString(), "BFS Result", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(this, "No nodes in the graph.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+            case "Dijkstra's Algorithm":
+                if (!nodes.isEmpty()) {
+                    Map<Node, Integer> distances = Algorithms.dijkstra(nodes, nodes.get(0)); // we can Change nodes.get(0) to the desired source node
+                    StringBuilder messageDijkstra = new StringBuilder("Dijkstra's Algorithm result:\n");
+                    for (Map.Entry<Node, Integer> entry : distances.entrySet()) {
+                        messageDijkstra.append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
+                    }
+                    JOptionPane.showMessageDialog(this, messageDijkstra.toString(), "Dijkstra's Algorithm Result", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(this, "No nodes in the graph.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+            case "Bellman-Ford Algorithm":
+                if (!nodes.isEmpty()) {
+                    try {
+                        Map<Node, Integer> distances = Algorithms.bellmanFord(nodes, edges, nodes.get(0)); // We can Change that also
+                        StringBuilder messageBellmanFord = new StringBuilder("Bellman-Ford Algorithm result:\n");
+                        for (Map.Entry<Node, Integer> entry : distances.entrySet()) {
+                            messageBellmanFord.append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
+                        }
+                        JOptionPane.showMessageDialog(this, messageBellmanFord.toString(), "Bellman-Ford Algorithm Result", JOptionPane.INFORMATION_MESSAGE);
+                    } catch (IllegalStateException e) {
+                        JOptionPane.showMessageDialog(this, "Graph contains a negative cycle.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(this, "No nodes in the graph.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+            case "Transitive Closure":
+                if (!nodes.isEmpty()) {
+                    boolean[][] closure = Algorithms.transitiveClosure(nodes, edges);
+                    StringBuilder messageClosure = new StringBuilder("Transitive Closure of the Graph:\n");
+                    for (int i = 0; i < nodes.size(); i++) {
+                        for (int j = 0; j < nodes.size(); j++) {
+                            if (closure[i][j]) {
+                                messageClosure.append("1 ");
+                            } else {
+                                messageClosure.append("0 ");
+                            }
+                        }
+                        messageClosure.append("\n");
+                    }
+                    JOptionPane.showMessageDialog(this, messageClosure.toString(), "Transitive Closure Result", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(this, "No nodes in the graph.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+            case "Dantzigs":
+                if (!nodes.isEmpty()) {
+                    List<Node> DantzigsResult = Algorithms.Dantzigs(nodes,nodes.get(0),nodes.get(nodes.size()-1));
+                    StringBuilder messageDantzigs = new StringBuilder("Dantzigs result:\n");
+                    for (Node node : DantzigsResult) {
+                        messageDantzigs.append(node).append("\n");
+                    }
+                    JOptionPane.showMessageDialog(this, messageDantzigs.toString(), "BFS Result", JOptionPane.INFORMATION_MESSAGE);
                 } else {
                     JOptionPane.showMessageDialog(this, "No nodes in the graph.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -920,16 +980,48 @@ public class GraphPanel extends JPanel {
             }
         }
 
-        // Display the adjacency matrix
+        // Create a JTextArea to display the adjacency matrix
+        JTextArea matrixArea = new JTextArea();
+        matrixArea.setEditable(false);
+        matrixArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
+
+        // Build the adjacency matrix string
         StringBuilder matrixText = new StringBuilder("Adjacency Matrix:\n");
-        for (int i = 0; i < numNodes; i++) {
-            for (int j = 0; j < numNodes; j++) {
-                matrixText.append(adjacencyMatrix[i][j]).append(" ");
+        for (int i = -1; i < numNodes; i++) {
+            for (int j = -1; j < numNodes; j++) {
+                if (i == -1 && j == -1) {
+                    matrixText.append("    ");
+                } else if (i == -1) {
+                    matrixText.append(String.format("%-4s", nodes.get(j).getNodeName()));
+                } else if (j == -1) {
+                    matrixText.append(String.format("%-4s", nodes.get(i).getNodeName()));
+                } else {
+                    matrixText.append(String.format("%-4d", adjacencyMatrix[i][j]));
+                }
             }
             matrixText.append("\n");
         }
-        JOptionPane.showMessageDialog(this, matrixText.toString(), "Adjacency Matrix", JOptionPane.PLAIN_MESSAGE);
+        matrixArea.setText(matrixText.toString());
+
+     // Put the JTextArea inside a JScrollPane for scrolling if needed
+        JScrollPane scrollPane = new JScrollPane(matrixArea);
+
+        // Display the adjacency matrix in a dialog
+        JOptionPane optionPane = new JOptionPane(scrollPane, JOptionPane.PLAIN_MESSAGE);
+        JDialog dialog = optionPane.createDialog("Adjacency Matrix");
+
+        // Set the location of the dialog to the top-right corner of the screen
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int dialogWidth = dialog.getWidth();
+        int dialogHeight = dialog.getHeight();
+        int x = screenSize.width - dialogWidth;
+        int y = 0;
+        dialog.setLocation(x, y);
+
+        // Show the dialog
+        dialog.setVisible(true);
     }
+
 
     
     //Getters and Setters

@@ -24,7 +24,7 @@ public class GraphConfigurationDialog extends JDialog {
     public GraphConfigurationDialog() {
     	
         setTitle("Graph Configuration");
-        setSize(400, 200);
+        setSize(500, 300);
         setModal(true);
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 

@@ -534,22 +534,40 @@ public class GraphPanel extends JPanel {
             case "Transitive Closure":
                 if (!nodes.isEmpty()) {
                     boolean[][] closure = Algorithms.transitiveClosure(nodes, edges);
-                    StringBuilder messageClosure = new StringBuilder("Transitive Closure of the Graph:\n");
-                    for (int i = 0; i < nodes.size(); i++) {
-                        for (int j = 0; j < nodes.size(); j++) {
-                            if (closure[i][j]) {
-                                messageClosure.append("1 ");
+
+                    // Create a JTextArea to display the transitive closure matrix
+                    JTextArea matrixArea = new JTextArea();
+                    matrixArea.setEditable(false);
+                    matrixArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
+
+                    // Build the transitive closure matrix string
+                    StringBuilder matrixText = new StringBuilder("Transitive Closure of the Graph:\n");
+                    for (int i = -1; i < nodes.size(); i++) {
+                        for (int j = -1; j < nodes.size(); j++) {
+                            if (i == -1 && j == -1) {
+                                matrixText.append("    ");
+                            } else if (i == -1) {
+                                matrixText.append(String.format("%-4s", nodes.get(j).getNodeName()));
+                            } else if (j == -1) {
+                                matrixText.append(String.format("%-4s", nodes.get(i).getNodeName()));
                             } else {
-                                messageClosure.append("0 ");
+                                matrixText.append(String.format("%-4d", closure[i][j] ? 1 : 0));
                             }
                         }
-                        messageClosure.append("\n");
+                        matrixText.append("\n");
                     }
-                    JOptionPane.showMessageDialog(this, messageClosure.toString(), "Transitive Closure Result", JOptionPane.INFORMATION_MESSAGE);
+                    matrixArea.setText(matrixText.toString());
+
+                    // Put the JTextArea inside a JScrollPane for scrolling if needed
+                    JScrollPane scrollPane = new JScrollPane(matrixArea);
+
+                    // Display the transitive closure matrix in a dialog
+                    JOptionPane.showMessageDialog(this, scrollPane, "Transitive Closure Result", JOptionPane.INFORMATION_MESSAGE);
                 } else {
                     JOptionPane.showMessageDialog(this, "No nodes in the graph.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
                 break;
+
             case "Dantzigs":
                 if (!nodes.isEmpty()) {
                     List<Node> DantzigsResult = Algorithms.Dantzigs(nodes,nodes.get(0),nodes.get(nodes.size()-1));
@@ -1013,7 +1031,6 @@ public class GraphPanel extends JPanel {
         // Set the location of the dialog to the top-right corner of the screen
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         int dialogWidth = dialog.getWidth();
-        int dialogHeight = dialog.getHeight();
         int x = screenSize.width - dialogWidth;
         int y = 0;
         dialog.setLocation(x, y);

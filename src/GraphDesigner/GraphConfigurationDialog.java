@@ -22,57 +22,72 @@ public class GraphConfigurationDialog extends JDialog {
     
 
     public GraphConfigurationDialog() {
-    	
         setTitle("Graph Configuration");
-        setSize(500, 300);
+        setSize(600, 350); // Increased size for better layout
         setModal(true);
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
-        JPanel panel = new JPanel(new GridLayout(4, 2));
+        JPanel panel = new JPanel(new GridLayout(5, 2, 10, 10)); // Added some spacing between components
+        
+        Font TitleFont = new Font(Font.SANS_SERIF, Font.BOLD, 30); // Increased font size for labels
+        Font labelFont = new Font(Font.SANS_SERIF, Font.PLAIN, 22); // Increased font size for labels
+        Font checkBoxFont = new Font(Font.SANS_SERIF, Font.PLAIN, 25); // Increased font size for checkboxes
+        
+        JLabel configurationLabel = new JLabel("<html><u>PreConfigurations:</u></html>");
+        configurationLabel.setFont(TitleFont);
+        panel.add(configurationLabel);
 
-        JLabel directedLabel = new JLabel("Directed:");
+        JLabel NBLabel = new JLabel("<html><u>(Check the box if yes)</u></html>");
+        NBLabel.setFont(labelFont);
+        panel.add(NBLabel);
+        
+        JLabel directedLabel = new JLabel("Directed Graph:");
+        directedLabel.setFont(labelFont);
         panel.add(directedLabel);
 
         JCheckBox directedCheckBox = new JCheckBox();
+        directedCheckBox.setFont(checkBoxFont);
         panel.add(directedCheckBox);
 
-        JLabel weightedLabel = new JLabel("Weighted:");
+        JLabel weightedLabel = new JLabel("Weighted Graph:");
+        weightedLabel.setFont(labelFont);
         panel.add(weightedLabel);
 
         JCheckBox weightedCheckBox = new JCheckBox();
+        weightedCheckBox.setFont(checkBoxFont);
         panel.add(weightedCheckBox);
 
         JLabel matrixLabel = new JLabel("Use Adjacency Matrix:");
+        matrixLabel.setFont(labelFont);
         panel.add(matrixLabel);
 
         JCheckBox matrixCheckBox = new JCheckBox();
+        matrixCheckBox.setFont(checkBoxFont);
         panel.add(matrixCheckBox);
-        
+
         JLabel loadGraphLabel = new JLabel("Load graph from file:");
+        loadGraphLabel.setFont(labelFont);
         panel.add(loadGraphLabel);
 
         JButton loadGraphButton = new JButton("LOAD GRAPH");
+        loadGraphButton.setFont(labelFont); // Increased font size for buttons
         loadGraphButton.addActionListener(new ActionListener() {
-        	
-        	@Override
+            @Override
             public void actionPerformed(ActionEvent e) {
-  
                 loadGraphFromFile();
             }
-        	
         });
         panel.add(loadGraphButton);
 
-        JButton saveButton = new JButton("Save");
+        JButton saveButton = new JButton("Create Graph");
+        saveButton.setFont(labelFont); // Increased font size for buttons
         saveButton.addActionListener(new ActionListener() {
-            
-        	@Override
+            @Override
             public void actionPerformed(ActionEvent e) {
-        		
                 directed = directedCheckBox.isSelected();
                 weighted = weightedCheckBox.isSelected();
                 useMatrix = matrixCheckBox.isSelected();
-                dispose();// close the container that contains the button (wich is the JDialog) after hitting save
+                dispose();
             }
         });
 
@@ -149,4 +164,8 @@ public class GraphConfigurationDialog extends JDialog {
     public boolean isLoaded() {
         return loaded; 
     }
+    
+    
 }
+
+

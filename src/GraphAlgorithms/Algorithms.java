@@ -439,32 +439,7 @@ public class Algorithms{
         return closure;
     }
     
-	// Depth-First Search (DFS)
-	public static List<Node> dfs(Node start) {
-	    List<Node> visited = new ArrayList<>();
-	    Set<Node> visitedSet = new HashSet<>();
-	    Stack<Node> stack = new Stack<>();
-	    
-	    stack.push(start);
-	
-	    while (!stack.isEmpty()) {
-	        Node currentNode = stack.pop();
-	        if (!visitedSet.contains(currentNode)) {
-	            visited.add(currentNode);
-	            visitedSet.add(currentNode);
-	            for (Edge edge : currentNode.getEdges()) {
-	                Node neighbor = edge.getEnd();
-	                if (!visitedSet.contains(neighbor)) {
-	                    stack.push(neighbor);
-	                }
-	            }
-	        }
-	    }
-	
-	    return visited;
-	}
-	
-	public static List<Node> Dantzigs(List<Node> nodes, Node source, Node destination) {
+    public static List<Node> Dantzigs(List<Node> nodes, Node source, Node destination) {
         Map<Node, Integer> distances = new HashMap<>();
         Map<Node, Node> previous = new HashMap<>();
         PriorityQueue<Node> pq = new PriorityQueue<>(Comparator.comparingInt(distances::get));
@@ -502,6 +477,32 @@ public class Algorithms{
 
         return shortestPath;
     }
+    
+    
+	// Depth-First Search (DFS)
+	public static List<Node> dfs(Node start) {
+	    List<Node> visited = new ArrayList<>();
+	    Set<Node> visitedSet = new HashSet<>();
+	    Stack<Node> stack = new Stack<>();
+	    
+	    stack.push(start);
+	
+	    while (!stack.isEmpty()) {
+	        Node currentNode = stack.pop();
+	        if (!visitedSet.contains(currentNode)) {
+	            visited.add(currentNode);
+	            visitedSet.add(currentNode);
+	            for (Edge edge : currentNode.getEdges()) {
+	                Node neighbor = edge.getEnd();
+	                if (!visitedSet.contains(neighbor)) {
+	                    stack.push(neighbor);
+	                }
+	            }
+	        }
+	    }
+	
+	    return visited;
+	}
 	
 	
 	// Breadth-First Search (BFS)

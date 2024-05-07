@@ -19,7 +19,7 @@ public class StructureConfigurationDialog extends JDialog {
     public StructureConfigurationDialog() {
     	
         setTitle("Select a designer");
-        setSize(400, 250);
+        setSize(500, 350);
         setResizable(false);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
@@ -31,11 +31,12 @@ public class StructureConfigurationDialog extends JDialog {
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(2, 1, 10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
+        
+        
         graphButton = new JButton("Graph Designer");
         // Set the font size of the button text
         Font graphFont = graphButton.getFont();
-        graphButton.setFont(graphFont.deriveFont(Font.BOLD, 20));
+        graphButton.setFont(graphFont.deriveFont(Font.BOLD, 35));
         graphButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -47,7 +48,7 @@ public class StructureConfigurationDialog extends JDialog {
         treeButton = new JButton("Tree Designer");
         // Set the font size of the button text
         Font treeFont = treeButton.getFont();
-        treeButton.setFont(treeFont.deriveFont(Font.BOLD, 20));
+        treeButton.setFont(treeFont.deriveFont(Font.BOLD, 35));
         treeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

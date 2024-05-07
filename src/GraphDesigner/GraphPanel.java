@@ -403,7 +403,7 @@ public class GraphPanel extends JPanel {
             case "Check Hamiltonian":
                 if (!nodes.isEmpty()) {
                 	if (directed) {
-                		isHamiltonian = Algorithms.isHamiltonianDirected(nodes, edges);
+                		isHamiltonian = Algorithms.isHamiltonianDirected(nodes);
                 	}else {
                 		isHamiltonian = Algorithms.isHamiltonian(nodes, edges);
                 	}

@@ -38,43 +38,47 @@ public class Algorithms{
 	}
 	
 	
-	// Hamiltonian Algorithm to check if a directed graph is Hamiltonian
-    public static boolean isHamiltonianDirected(List<Node> nodes, List<Edge> edges) {
+	public static boolean isHamiltonianDirected(List<Node> nodes) {
         for (Node node : nodes) {
-            if (isHamiltonianDFS(node, new ArrayList<>(nodes), edges, new ArrayList<>())) {
+            List<Node> path = new ArrayList<>();
+            Set<Node> visited = new HashSet<>();
+            if (hamiltonianUtil(node, node, path, visited, nodes.size())) {
+                // Found a Hamiltonian cycle
                 return true;
             }
         }
+        // No Hamiltonian cycle found
         return false;
     }
 
-    private static boolean isHamiltonianDFS(Node currentNode, List<Node> remainingNodes, List<Edge> edges, List<Node> path) {
+    private static boolean hamiltonianUtil(Node startNode, Node currentNode, List<Node> path, Set<Node> visited, int totalNodes) {
+        visited.add(currentNode);
         path.add(currentNode);
-        remainingNodes.remove(currentNode);
-
-        if (remainingNodes.isEmpty()) {
-            // All nodes visited once, check if last node has an edge to the starting node
-            Node startNode = path.get(0);
+        if (path.size() == totalNodes) {
+            // All nodes visited, check if it's a cycle
             for (Edge edge : currentNode.getEdges()) {
-                if (edge.getEnd() == startNode) {
-                    return true; // Hamiltonian cycle found
+                if (edge.getEnd().equals(startNode)) {
+                    // Found a cycle
+                    return true;
                 }
             }
-            return false; // Hamiltonian path found, but not a cycle
+            
+            // No cycle found
+            return false;
         }
-
         for (Edge edge : currentNode.getEdges()) {
             Node nextNode = edge.getEnd();
-            if (remainingNodes.contains(nextNode)) {
-                if (isHamiltonianDFS(nextNode, new ArrayList<>(remainingNodes), edges, new ArrayList<>(path))) {
+            if (!visited.contains(nextNode)) {
+                if (hamiltonianUtil(startNode, nextNode, path, visited , totalNodes)) {
                     return true;
                 }
             }
         }
-
+        // Backtrack
+        visited.remove(currentNode);
+        path.remove(path.size() - 1);
         return false;
     }
-	
 	
 	// Check Eulerian for undirected graphs
 	// A graph is Eulerian if all of its vertices have even degree
@@ -205,7 +209,6 @@ public class Algorithms{
     }
     
     
- // Hierholzer's Algorithm to find Eulerian path in a directed graph
     public static List<Node> hierholzerDirected(List<Node> nodes, List<Edge> edges) {
         List<Node> path = new ArrayList<>();
         
@@ -214,9 +217,6 @@ public class Algorithms{
             // If the graph is not Eulerian or semi-Eulerian, return an empty path
             return path;
         }
-        
-        // Initialize a copy of the edges list to track visited edges
-        List<Edge> remainingEdges = new ArrayList<>(edges);
         
         // Initialize a map to track visited edges for each node
         Map<Node, List<Edge>> visitedEdgesMap = new HashMap<>();
@@ -237,43 +237,21 @@ public class Algorithms{
         
         while (!stack.isEmpty()) {
             Node currentNode = stack.peek();
-            List<Edge> edgesFromCurrentNode = currentNode.getEdges();
-            boolean foundNextEdge = false;
+            List<Edge> edgesFromCurrentNode = getUnvisitedOutEdges(currentNode, visitedEdgesMap);
             
-            for (Edge edge : edgesFromCurrentNode) {
-                if (remainingEdges.contains(edge) && !visitedEdgesMap.get(currentNode).contains(edge)) {
-                    // Remove the edge from the remaining edges list
-                    remainingEdges.remove(edge);
-                    
-                    // Mark the edge as visited
-                    visitedEdgesMap.get(currentNode).add(edge);
-                    
-                    // Push the end node of the edge onto the stack
-                    stack.push(edge.getEnd());
-                    
-                    foundNextEdge = true;
-                    break;
-                }
-            }
-            
-            if (!foundNextEdge) {
-                // If no valid edge is found, add the current node to the path
+            if (!edgesFromCurrentNode.isEmpty()) {
+                // Choose an unvisited edge from the current node
+                Edge nextEdge = edgesFromCurrentNode.get(0);
+                stack.push(nextEdge.getEnd());
+                visitedEdgesMap.get(currentNode).add(nextEdge);
+            } else {
+                // If all edges from the current node are visited, add the node to the path
                 path.add(0, stack.pop());
-                
-                // Check if there are remaining edges and the current node has no outgoing edges
-                if (!remainingEdges.isEmpty() && currentNode.getEdges().isEmpty()) {
-                    // Find a new starting node with remaining edges
-                    Node newStartNode = findStartNodeWithRemainingEdges(nodes, visitedEdgesMap);
-                    if (newStartNode != null) {
-                        // Push the new starting node onto the stack
-                        stack.push(newStartNode);
-                    }
-                }
             }
         }
         
         // Check if all edges have been visited
-        if (remainingEdges.isEmpty()) {
+        if (allEdgesVisited(visitedEdgesMap)) {
             return path;
         } else {
             // If there are remaining edges, the graph is not connected, return an empty path
@@ -281,37 +259,53 @@ public class Algorithms{
         }
     }
     
-    // Helper method to find a suitable start node for the Eulerian path
+ // Helper method to find a suitable start node for the Eulerian path
     private static Node findStartNodeDirected(List<Node> nodes) {
-        Node startNode = null;
         for (Node node : nodes) {
-            int outDegree = node.getEdges().size();
-            int inDegree = 0;
-            for (Edge edge : node.getEdges()) {
-                if (edge.getEnd() == node) {
-                    inDegree++;
-                }
-            }
-            if (outDegree - inDegree == 1 || inDegree - outDegree == 1) {
-                startNode = node;
-                break;
+            if (getOutDegree(node) - getInDegree(node) == 1) {
+                return node;
             }
         }
-        return startNode;
+        // If no suitable starting node is found, return null
+        return null;
     }
     
-    // Helper method to find a new starting node with remaining edges
-    private static Node findStartNodeWithRemainingEdges(List<Node> nodes, Map<Node, List<Edge>> visitedEdgesMap) {
-        for (Node node : nodes) {
-            if (!visitedEdgesMap.get(node).isEmpty()) {
-                for (Edge edge : node.getEdges()) {
-                    if (!visitedEdgesMap.get(node).contains(edge)) {
-                        return node;
-                    }
-                }
+    
+    // Helper method to get unvisited out edges from a node
+    private static List<Edge> getUnvisitedOutEdges(Node node, Map<Node, List<Edge>> visitedEdgesMap) {
+        List<Edge> unvisitedOutEdges = new ArrayList<>();
+        for (Edge edge : node.getEdges()) {
+            if (!visitedEdgesMap.get(node).contains(edge)) {
+                unvisitedOutEdges.add(edge);
             }
         }
-        return null;
+        return unvisitedOutEdges;
+    }
+    
+ // Helper method to check if all edges are visited
+    private static boolean allEdgesVisited(Map<Node, List<Edge>> visitedEdgesMap) {
+        for (List<Edge> visitedEdges : visitedEdgesMap.values()) {
+            if (!visitedEdges.isEmpty() && visitedEdges.size() != getOutDegree(visitedEdges.get(0).getStart())) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    // Helper method to get the out degree of a node
+    private static int getOutDegree(Node node) {
+        return node.getEdges().size();
+    }
+    
+    // Helper method to get the in degree of a node
+    private static int getInDegree(Node node) {
+        int inDegree = 0;
+        for (Edge edge : node.getEdges()) {
+            if (edge.getEnd() == node) {
+                inDegree++;
+            }
+        }
+        return inDegree;
     }
     
     public static List<Node> fleuryDirected(List<Node> nodes, List<Edge> edges) {

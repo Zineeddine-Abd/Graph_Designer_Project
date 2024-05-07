@@ -27,7 +27,29 @@ public class GraphConfigurationDialog extends JDialog {
         setModal(true);
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
-        JPanel panel = new JPanel(new GridLayout(5, 2, 10, 10)); // Added some spacing between components
+        JPanel panel = new JPanel(new GridLayout(5, 2, 10, 10)) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                g.setColor(Color.GRAY);
+                int width = getWidth();
+                int height = getHeight();
+                int rows = 5;
+                int cols = 2;
+                int cellWidth = width / cols;
+                int cellHeight = height / rows;
+                // Draw horizontal lines
+                for (int i = 1; i < rows; i++) {
+                    int y = i * cellHeight;
+                    g.drawLine(0, y, width, y);
+                }
+                // Draw vertical lines
+                for (int i = 1; i < cols; i++) {
+                    int x = i * cellWidth;
+                    g.drawLine(x, 0, x, height);
+                }
+            }
+        };
         
         Font TitleFont = new Font(Font.SANS_SERIF, Font.BOLD, 30); // Increased font size for labels
         Font labelFont = new Font(Font.SANS_SERIF, Font.PLAIN, 22); // Increased font size for labels
@@ -37,11 +59,11 @@ public class GraphConfigurationDialog extends JDialog {
         configurationLabel.setFont(TitleFont);
         panel.add(configurationLabel);
 
-        JLabel NBLabel = new JLabel("<html><u>(Check the box if yes)</u></html>");
+        JLabel NBLabel = new JLabel("");
         NBLabel.setFont(labelFont);
         panel.add(NBLabel);
         
-        JLabel directedLabel = new JLabel("Directed Graph:");
+        JLabel directedLabel = new JLabel("is the graph Directed:");
         directedLabel.setFont(labelFont);
         panel.add(directedLabel);
 
@@ -49,7 +71,7 @@ public class GraphConfigurationDialog extends JDialog {
         directedCheckBox.setFont(checkBoxFont);
         panel.add(directedCheckBox);
 
-        JLabel weightedLabel = new JLabel("Weighted Graph:");
+        JLabel weightedLabel = new JLabel("is the graph Weighted:");
         weightedLabel.setFont(labelFont);
         panel.add(weightedLabel);
 

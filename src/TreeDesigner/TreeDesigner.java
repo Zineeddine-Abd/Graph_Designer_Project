@@ -15,8 +15,9 @@ public class TreeDesigner extends JFrame {
         setSize(1700, 900);
 
         
-        // Load the icon
-        ImageIcon icon = new ImageIcon("Tree_Icon.png");
+        // Load the icon from the resources directory
+        ImageIcon icon = new ImageIcon(getClass().getResource("/imgs/Tree_Icon.png"));
+        // Set the icon image
         setIconImage(icon.getImage());
         
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

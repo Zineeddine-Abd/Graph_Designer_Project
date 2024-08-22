@@ -1,3 +1,5 @@
+![Banner](https://raw.githubusercontent.com/Zineeddine-Abd/Graph_Designer_Project/master/Project_Banner.png?token=GHSAT0AAAAAACWKQX3QHAAAOL6QPL7VMM2GZWHGMWA)
+
 # Graph Designer Project
 
 Graph Designer Project is a Java application for designing custom graphs and trees, and applying algorithms on them. The application is built using pure Java and Java Swing, offering a clean and intuitive interface for creating and managing graph structures.
@@ -30,12 +32,12 @@ Graph Designer Project is a Java application for designing custom graphs and tre
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/Graph_Designer_Project.git
+   git clone https://github.com/yourusername/Graph_Designer_Project.git](https://github.com/Zineeddine-Abd/Graph_Designer_Project.git
    ```
 
 2. Compile and run the application using your preferred IDE or command line:
    ```bash
-   javac -cp src src/Main.java
+   javac -cp src src/MainPackage/Main.java
    java -cp src Main
    ```
 

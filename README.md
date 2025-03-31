@@ -1,4 +1,4 @@
-![Banner](https://raw.githubusercontent.com/Zineeddine-Abd/Graph_Designer_Project/master/Project_Banner.png?token=GHSAT0AAAAAACWKQX3Q4VQXQNYRQWSWZ27IZWHHG6A)
+![Banner](https://raw.githubusercontent.com/Zineeddine-Abd/Graph_Designer_Project/master/Project_Banner.png?token=GHSAT0AAAAAACWKQX3Q4VQXQNYRQWSWZ27IZWHHG6A](https://raw.githubusercontent.com/Zineeddine-Abd/Graph_Designer_Project/refs/heads/master/Project_Banner.png)
 
 # Graph Designer Project
 

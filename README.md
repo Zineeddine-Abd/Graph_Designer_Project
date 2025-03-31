@@ -1,4 +1,4 @@
-![Banner](./banner.png)
+![Banner](./Project_Banner.png)
 # Graph Designer Project
 
 Graph Designer Project is a Java application for designing custom graphs and trees, and applying algorithms on them. The application is built using pure Java and Java Swing, offering a clean and intuitive interface for creating and managing graph structures.
@@ -7,7 +7,7 @@ Graph Designer Project is a Java application for designing custom graphs and tre
 ![Static Badge](https://img.shields.io/badge/Java--Swing-red)
 ![Static Badge](https://img.shields.io/badge/Graph--Algorithms-BLUE)
 
-![GIF](https://raw.githubusercontent.com/Zineeddine-Abd/Graph_Designer_Project/master/App_Gif.gif?token=GHSAT0AAAAAACWKQX3RTIAM6U2P7JWCH6KWZWHHITQ)
+![GIF](./App_Gif.gif)
 
 ## Key Features
 

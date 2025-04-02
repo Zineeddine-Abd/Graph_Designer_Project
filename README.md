@@ -37,13 +37,12 @@ Graph Designer Project is a Java application for designing custom graphs and tre
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/Graph_Designer_Project.git](https://github.com/Zineeddine-Abd/Graph_Designer_Project.git
+   git clone https://github.com/Zineeddine-Abd/Graph_Designer_Project.git
    ```
 
 2. Compile and run the application using your preferred IDE or command line:
    ```bash
    javac -cp src src/MainPackage/Main.java
-   java -cp src Main
    ```
 
 ## Project Status
